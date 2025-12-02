@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="mx.uaemex.fi.paradigmas.pptls.HelloController">
+<VBox alignment="CENTER" prefHeight="265.0" prefWidth="328.0" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="mx.uaemex.fi.paradigmas.pptls.HelloController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
+   <children>
+      <TableView fx:id="tablaRecords" prefHeight="200.0" prefWidth="200.0">
+        <columns>
+          <TableColumn fx:id="colJugador" prefWidth="75.0" text="Jugador" />
+          <TableColumn fx:id="colJuego" prefWidth="75.0" text="Juego" />
+            <TableColumn fx:id="colFecha" prefWidth="75.0" text="Fecha" />
+            <TableColumn fx:id="colPuntaje" prefWidth="75.0" text="Puntaje" />
+        </columns>
+      </TableView>
+   </children>
 </VBox>
