@@ -30,7 +30,7 @@ public class HelloController implements Initializable {
         //inicializar la lista
         listaDeRecords = FXCollections.observableArrayList();
 
-        // Busca automáticamente el método getRecord() en tu clase Record
+        // Busca automáticamente el metodo
         colPuntaje.setCellValueFactory(new PropertyValueFactory<>("record"));
 
         //Objetos anidados (Jugador)
