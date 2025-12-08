@@ -47,7 +47,6 @@ public class LoginController {
         esModoOnline = true;
 
         lblModoActual.setText("Modo: Multijugador (Online)");
-        txtFldLogin.setPromptText("Usuario");
         txtFldPassword.setDisable(false);
 
         btnModoOnline.setStyle("-fx-background-color: #ffffff; -fx-text-fill: black;");
@@ -60,7 +59,6 @@ public class LoginController {
         esModoOnline = false;
 
         lblModoActual.setText("Modo: Local");
-        txtFldLogin.setPromptText("Nickname");
         // txtFldPassword.setDisable(true);
 
         btnModoOnline.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
