@@ -9,5 +9,7 @@ module mx.uaemex.fi.paradigmas.pptls {
     requires mx.uaemex.fi.paradigmas.pptls;
 
     opens mx.uaemex.fi.paradigmas.pptls to javafx.fxml;
+    opens mx.uaemex.fi.paradigmas.pptls.controller to javafx.fxml;
+
     exports mx.uaemex.fi.paradigmas.pptls;
 }
