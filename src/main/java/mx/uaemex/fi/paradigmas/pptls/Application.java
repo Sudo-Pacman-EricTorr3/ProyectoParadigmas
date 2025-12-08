@@ -1,6 +1,5 @@
 package mx.uaemex.fi.paradigmas.pptls;
 
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -14,30 +13,31 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class HelloApplication extends Application {
+public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage stage) throws IOException, SQLException {
-        LoginController ctrl;
+        LoginController Loginctrl;
         String url = "jdbc:postgresql://database-1.cnsiwgwsie1g.us-east-2.rds.amazonaws.com/pptls?user=postgres&password=Admin-AWS-123";
 
         Connection conn = DriverManager.getConnection(url);
         JugadoresServiceLocal servicioLocal = new JugadoresServiceLocal();
-
         JugadoresDAOPsqlImp dao = new JugadoresDAOPsqlImp();
-
         dao.setConexion(conn);
         servicioLocal.setDao(dao);
 
-        JugadoresService servicio = servicioLocal;
+        JugadoresServiceLocal servicioOnline = new JugadoresServiceLocal();
+        servicioOnline.setDao(dao);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Login-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 250, 450);
+        FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Login-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Iniciar Sesión");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
 
-        ctrl = fxmlLoader.getController();
-        ctrl.setServicio(servicio);
+        Loginctrl = fxmlLoader.getController();
+        Loginctrl.setServicioLocal(servicioLocal);
+        Loginctrl.setServicioOnline(servicioOnline);
     }
 }

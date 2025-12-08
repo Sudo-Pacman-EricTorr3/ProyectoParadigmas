@@ -93,7 +93,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>mx.uaemex.fi.paradigmas.pptls/mx.uaemex.fi.paradigmas.pptls.HelloApplication
+                            <mainClass>mx.uaemex.fi.paradigmas.pptls/mx.uaemex.fi.paradigmas.pptls.Application
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
