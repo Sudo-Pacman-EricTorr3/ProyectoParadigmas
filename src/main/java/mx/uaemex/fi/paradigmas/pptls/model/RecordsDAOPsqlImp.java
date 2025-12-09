@@ -3,10 +3,7 @@ import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Juego;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -21,7 +18,7 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
         Date fecha;
 
         try {
-            sql = "INSERT INTO records (jugador_id, juego_id, fecha, puntaje) VALUES (?, ?, ?, ?)";
+            sql = "INSERT INTO record (jugador_id, juego_id, fecha, puntaje) VALUES (?, ?, ?, ?)";
             pstmt = this.conexion.prepareStatement(sql);
 
             jugadorId = r.getJugador().getId();
@@ -74,7 +71,7 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
         Juego g;
 
         try {
-            sql = "SELECT * FROM records";
+            sql = "SELECT * FROM record";
             stmt = this.conexion.createStatement();
             resultado = stmt.executeQuery(sql);
             ArrayList<Record> records = new ArrayList<>();
@@ -126,7 +123,7 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
             stmt = this.conexion.createStatement();
 
             // Paso (1):
-            sql = new StringBuilder("SELECT * FROM records");
+            sql = new StringBuilder("SELECT * FROM record");
 
             // Paso (2): Construcción dinámica del WHERE
 
@@ -215,35 +212,18 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
 
     @Override
     public void actualizar(Record r) {
-        StringBuilder sql;
-        int jugadorId, juegoId, puntaje, numColumnas = 0;
-        Date fecha;
-        Statement stmt;
-
-        try {
-            stmt = this.conexion.createStatement();
-            sql = new StringBuilder("UPDATE records SET");
-
-            puntaje = r.getRecord();
-            if(puntaje > 0){
-                sql.append(" puntaje=" + puntaje);
-                numColumnas++;
-            }
-
-            jugadorId = r.getJugador().getId();
-            juegoId = r.getJuego().getId();
-            fecha = r.getFecha();
-
-            sql.append(" WHERE jugador_id=" + jugadorId);
-            sql.append(" AND juego_id=" + juegoId);
-            sql.append(" AND fecha='" + new java.sql.Date(r.getFecha().getTime()) + "'");
-
-            if(numColumnas > 0) {
-                stmt.executeUpdate(sql.toString());
-            }else{
-                System.out.println("No hay un puntaje para actualizar el record: " + r.getId());
-            }
-        } catch (SQLException e) {
+        String sql;
+        PreparedStatement stmt;
+        try{
+            sql="update record set (jugador=?,juego=?,fecha=?,record=?)";
+            stmt=this.conexion.prepareStatement(sql);
+            stmt.setInt(1, r.getJugador().getId());
+            stmt.setInt(2,r.getJuego().getId());
+            stmt.setDate(3,new java.sql.Date(r.getFecha().getTime()));
+            stmt.setInt(4,r.getRecord());
+            stmt.setInt(5,r.getId());
+            stmt.executeUpdate();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -254,7 +234,7 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
         PreparedStatement pstmt;
 
         try {
-            sql = "DELETE FROM records WHERE jugador_id=? AND juego_id=? AND fecha=?";
+            sql = "DELETE FROM record WHERE jugador_id=? AND juego_id=? AND fecha=?";
             pstmt = this.conexion.prepareStatement(sql);
 
             pstmt.setInt(1, r.getJugador().getId());
