@@ -6,6 +6,8 @@ import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.controller.LoginController;
 import mx.uaemex.fi.paradigmas.pptls.model.JugadoresDAOPsqlImp;
 import mx.uaemex.fi.paradigmas.pptls.service.JugadoresServiceLocal;
+import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceLocal;
+import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceOnline;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -24,6 +26,15 @@ public class Application extends javafx.application.Application {
         JugadoresServiceLocal servicioLocal = new JugadoresServiceLocal();
         JugadoresServiceLocal servicioOnline = new JugadoresServiceLocal();
 
+
+        //instanciación de servicios de records
+        //modo local
+        //no necesita DAO ni Conexión, usa Memoria RAM  o sea el ArrayList
+        RecordsServiceLocal servicioRecordsLocal = new RecordsServiceLocal();
+
+        //para el modo online pero aqui lo dejo pendiente para a conexion a el servicio de Gael o la que se
+        // vaya a base de datos que se vaya a usar
+        RecordsServiceOnline servicioRecordsOnline = new RecordsServiceOnline();
         try {
             conn = DriverManager.getConnection(url);
 
