@@ -4,10 +4,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.controller.LoginController;
+import mx.uaemex.fi.paradigmas.pptls.model.JugadoresDAOLocalImp;
 import mx.uaemex.fi.paradigmas.pptls.model.JugadoresDAOPsqlImp;
 import mx.uaemex.fi.paradigmas.pptls.service.JugadoresServiceLocal;
-import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceLocal;
-import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceOnline;
+import mx.uaemex.fi.paradigmas.pptls.service.JugadoresServiceOnline;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -20,29 +20,21 @@ public class Application extends javafx.application.Application {
 
     @Override
     public void start(Stage stage) throws IOException, SQLException {
-        LoginController LoginCtrl;
+        LoginController LoginController;
         String url = "jdbc:postgresql://database-1.cnsiwgwsie1g.us-east-2.rds.amazonaws.com/pptls?user=postgres&password=Admin-AWS-123";
 
-        JugadoresServiceLocal servicioLocal = new JugadoresServiceLocal();
-        JugadoresServiceLocal servicioOnline = new JugadoresServiceLocal();
+        JugadoresServiceLocal servicioJugadoresLocal = new JugadoresServiceLocal();
+        JugadoresServiceOnline servicioJugadoresOnline = new JugadoresServiceOnline();
 
-
-        //instanciación de servicios de records
-        //modo local
-        //no necesita DAO ni Conexión, usa Memoria RAM  o sea el ArrayList
-        RecordsServiceLocal servicioRecordsLocal = new RecordsServiceLocal();
-
-        //para el modo online pero aqui lo dejo pendiente para a conexion a el servicio de Gael o la que se
-        // vaya a base de datos que se vaya a usar
-        RecordsServiceOnline servicioRecordsOnline = new RecordsServiceOnline();
         try {
             conn = DriverManager.getConnection(url);
 
-            JugadoresDAOPsqlImp dao = new JugadoresDAOPsqlImp();
-            dao.setConexion(conn);
+            JugadoresDAOPsqlImp daoJugadoresOnline = new JugadoresDAOPsqlImp();
+            daoJugadoresOnline.setConexion(conn);
+            servicioJugadoresOnline.setDao(daoJugadoresOnline);
 
-            servicioLocal.setDao(dao);
-            servicioOnline.setDao(dao);
+            JugadoresDAOLocalImp daoJugadoresLocal = new JugadoresDAOLocalImp();
+            servicioJugadoresLocal.setDao(daoJugadoresLocal);
 
             System.out.println("Conexión a la BD exitosa.");
 
@@ -58,9 +50,10 @@ public class Application extends javafx.application.Application {
         stage.setResizable(false);
         stage.show();
 
-        LoginCtrl = fxmlLoader.getController();
-        LoginCtrl.setServicioLocal(servicioLocal);
-        LoginCtrl.setServicioOnline(servicioOnline);
+        LoginController = fxmlLoader.getController();
+        LoginController.setServicioJugadoresLocal(servicioJugadoresLocal);
+        LoginController.setServicioJugadoresOnline(servicioJugadoresOnline);
+        LoginController.clickOnline();
     }
 
     @Override
