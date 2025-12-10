@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.Application;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 import mx.uaemex.fi.paradigmas.pptls.service.JugadoresService;
-import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,21 +29,24 @@ public class LoginController {
     @FXML
     private Label lblMensaje;
 
-    private boolean esModoOnline = true;
+    private JugadoresService servicioJugadoresLocal;
+    private JugadoresService servicioJugadoresOnline;
+    private JugadoresService servicioJugadores;
 
-    private JugadoresService servicioLocal;
-    private JugadoresService servicioOnline;
-
-    public void setServicioLocal(JugadoresService s) {
-        this.servicioLocal = s;
+    public void setServicioJugadoresLocal(JugadoresService s) {
+        this.servicioJugadoresLocal = s;
     }
-    public void setServicioOnline(JugadoresService s) {
-        this.servicioOnline = s;
+    public void setServicioJugadoresOnline(JugadoresService s) {
+        this.servicioJugadoresOnline = s;
+    }
+    public void setServicioJugadores(JugadoresService s) {
+        this.servicioJugadores = s;
     }
 
     @FXML
-    protected void clickOnline() {
-        esModoOnline = true;
+    public void clickOnline() {
+        this.servicioJugadores = this.servicioJugadoresOnline;
+        System.out.println("Utilizando Servicio ONLINE");
 
         lblModoActual.setText("Modo: Multijugador (Online)");
         txtFldPassword.setDisable(false);
@@ -54,19 +56,19 @@ public class LoginController {
     }
 
     @FXML
-    protected void clicKLocal() {
-
-        esModoOnline = false;
+    public void clicKLocal() {
+        this.servicioJugadores = this.servicioJugadoresLocal;
+        System.out.println("Utilizando Servicio LOCAL");
 
         lblModoActual.setText("Modo: Local");
-        // txtFldPassword.setDisable(true);
+        txtFldPassword.setDisable(false);
 
         btnModoOnline.setStyle("-fx-background-color: #333333; -fx-text-fill: white;");
         btnModoLocal.setStyle("-fx-background-color: #ffffff; -fx-text-fill: black;");
     }
 
     @FXML
-    protected void Entrar() {
+    protected void entrar() {
         String login;
         String password;
 
@@ -79,24 +81,18 @@ public class LoginController {
         jugador.setLogin(login);
         jugador.setPassword(password);
 
-        if (esModoOnline) {
-            consultados = servicioOnline.consultar(jugador);
-            System.out.println("Utilizando Servicio ONLINE");
-        } else {
-            consultados = servicioLocal.consultar(jugador);
-            System.out.println("Utilizando Servicio LOCAL");
-        }
+        consultados = this.servicioJugadores.consultar(jugador);
 
         if (consultados == null || consultados.isEmpty()) {
             mostrarError("Error: Credenciales incorrectas"); // Usuario no existe
         } else {
-            Jugador encontrado = consultados.get(0);
+            Jugador jugadorActual = consultados.get(0);
 
-            if (encontrado.getPassword().equals(password)) {
+            if (jugadorActual.getPassword().equals(password)) {
 
-                if (encontrado.isActivo()) {
+                if (jugadorActual.isActivo()) {
                     System.out.println("Login exitoso, abriendo juego...");
-                    abrirVentanaJuego();
+                    abrirVentanaMenu(jugadorActual);
                 } else {
                     mostrarError("Error: Cuenta inactiva");
                 }
@@ -114,23 +110,51 @@ public class LoginController {
         System.out.println(mensaje);
     }
 
-    private void abrirVentanaJuego() {
+    private void abrirVentanaMenu(Jugador jugadorActual) {
         try {
             Stage stageActual = (Stage) txtFldLogin.getScene().getWindow();
             stageActual.close();
 
             FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Menu-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
+            MenuController menuController = fxmlLoader.getController();
+
+            menuController.setServicioJugadores(servicioJugadores);
+            menuController.setJugador(jugadorActual);
 
             Stage stageNuevo = new Stage();
             stageNuevo.setTitle("Juego PPTLS");
             stageNuevo.setScene(scene);
             stageNuevo.show();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            mostrarError("Error al cargar la siguiente ventana");
+            mostrarError("Error al cargar el juego.");
         }
     }
 
+    @FXML
+    protected void registrarse() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Register-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            Stage stage = (Stage) txtFldLogin.getScene().getWindow();
+            stage.setTitle("Registro");
+            stage.setScene(scene);
+
+            RegisterController registerController = fxmlLoader.getController();
+            registerController.setServicioJugadoresOnline(this.servicioJugadoresOnline);
+            registerController.setServicioJugadoresLocal(this.servicioJugadoresLocal);
+
+            if (this.servicioJugadores == this.servicioJugadoresOnline) {
+                registerController.clickOnline();
+            } else {
+                registerController.clicKLocal();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

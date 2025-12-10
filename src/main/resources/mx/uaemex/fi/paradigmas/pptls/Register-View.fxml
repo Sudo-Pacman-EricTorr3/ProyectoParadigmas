@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="15.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.paradigmas.pptls.controller.RegisterController">
+    <padding>
+        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <Label text="Crear Cuenta Nueva" textFill="WHITE">
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
+    </Label>
+
+    <HBox alignment="CENTER" spacing="0.0">
+        <Button fx:id="btnModoOnline" onAction="#clickOnline" prefWidth="100.0" style="-fx-background-color: #ffffff; -fx-text-fill: black;" text="Online" />
+        <Button fx:id="btnModoLocal" onAction="#clicKLocal" prefWidth="100.0" style="-fx-background-color: #333333; -fx-text-fill: white;" text="Local" />
+    </HBox>
+
+    <Label fx:id="lblModoActual" text="Registrando en: Servicio Online (Multijugador)" textFill="#aaaaaa">
+        <font>
+            <Font name="System Italic" size="12.0" />
+        </font>
+    </Label>
+
+    <VBox spacing="10.0">
+        <Label text="Login" textFill="#aaaaaa" />
+        <TextField fx:id="txtFldLogin" promptText="Elige un nombre de usuario" />
+
+        <Label text="Correo Electrónico" textFill="#aaaaaa" />
+        <TextField fx:id="txtFldEmail" promptText="ejemplo@correo.com" />
+
+        <Label text="Contraseña" textFill="#aaaaaa" />
+        <PasswordField fx:id="txtFldPassword" promptText="Escribe tu contraseña" />
+
+        <Label text="Confirmar Contraseña" textFill="#aaaaaa" />
+        <PasswordField fx:id="txtFldConfirmPassword" promptText="Repite tu contraseña" />
+    </VBox>
+
+    <Label fx:id="lblMensaje" textFill="#ff3b3b" visible="false" wrapText="true">
+        <font>
+            <Font name="System Bold" size="12.0" />
+        </font>
+    </Label>
+
+    <HBox alignment="CENTER" spacing="15.0" style="-fx-padding: 10 0 0 0;">
+        <Button onAction="#volverAlLogin" style="-fx-background-color: #333333; -fx-text-fill: white;" text="Cancelar" />
+        <Button onAction="#registrarse" style="-fx-background-color: #ffffff; -fx-text-fill: black; -fx-font-weight: bold;" text="Registrarse" />
+    </HBox>
+
+</VBox>
