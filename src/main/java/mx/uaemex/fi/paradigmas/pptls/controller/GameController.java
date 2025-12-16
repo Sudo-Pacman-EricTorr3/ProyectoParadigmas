@@ -363,5 +363,6 @@ recordMasAlto=r.getRecord();
         ActualizarLabelsV();
 
     }
+    //Agregar boton para regresar al menu o terminar partida
 }
 
