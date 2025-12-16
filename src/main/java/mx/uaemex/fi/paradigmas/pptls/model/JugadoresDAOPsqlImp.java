@@ -28,12 +28,18 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
                 throw new RuntimeException("Informacion insuficiente, NO es posible hacer el registro");
             }
 
+            Jugador jugadorExistente = new Jugador();
+            jugadorExistente.setLogin(login);
+            if (!this.consultar(jugadorExistente).isEmpty()) {
+                throw new RuntimeException("El login '" + login + "' ya está ocupado.");
+            }
+
             stmt.setString(1, login);
             stmt.setString(2, password);
             stmt.setString(3, correo);
             stmt.setBoolean(4, true);
 
-            stmt.executeUpdate(sql.toString());
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -210,7 +216,7 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
         try {
             pstmt = this.conexion.prepareStatement(sql);
             pstmt.setString(1, j.getLogin());
-            pstmt.executeUpdate(sql);
+            pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
