@@ -16,6 +16,7 @@ import mx.uaemex.fi.paradigmas.pptls.service.RecordsService;
 import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceLocal;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -78,7 +79,9 @@ public class GameController {
         this.servicioRecord=ServicioR;
     };
 public void setJugador(Jugador jugador){
-        this.jugador=jugador;
+
+    this.jugador=jugador;
+    cargarRecordExistente();
 }
     Image imgPrs = new Image(getClass().getResource("/imagenes/PiedraRes.png").toExternalForm());//imagen de resultado de la pc para piedra
     Image imgTrs = new Image(getClass().getResource("/imagenes/TijerasRes.png").toExternalForm());//imagen de resultado de la pc para tijeras
@@ -94,41 +97,71 @@ public void setJugador(Jugador jugador){
     private void guardarNuevoRecord(){
         if(victoriasConsecutivas<=recordMasAlto) return;
             try {
-                Record filtro= new Record();
-                filtro.setJugador(jugador);
-                Juego juego=new Juego();
-                juego.setId(1);
-                filtro.setJuego(juego);
-               // var existentes=servicioRecord.consultar(filtro);
-                List<Record> existentes=servicioRecord.consultar(filtro);
-                if (existentes.isEmpty()) {
-                    Record nuevo = new Record();
+                ArrayList<Record> Records=servicioRecord.consultarRecords();
+                Record recordExiste=null;
+                for(Record r:Records){
+                    if(r.getJugador()!=null&&
+                            r.getJugador().getId()==jugador.getId()&&
+                    r.getJuego()!=null&&
+                    r.getJuego().getId()==1){
+                        recordExiste=r;
+                        break;
+
+                    }
+
+                }
+                if(recordExiste==null){
+                    Record nuevo=new Record();
                     nuevo.setJugador(jugador);
+                    Juego juego =new Juego();
+                    juego.setId(1);
                     nuevo.setJuego(juego);
                     nuevo.setFecha(new Date());
                     nuevo.setRecord(victoriasConsecutivas);
-                    servicioRecord.insertar(nuevo);
-                    lblRecord.setText("NUEVO RECORD");
-                    imgRecord.setImage(imagenR);
-                    recordMasAlto=victoriasConsecutivas;
-                    return;}
-                Record actual=existentes.get(0);
-                    if (victoriasConsecutivas > actual.getRecord()) {
-                        actual.setRecord(victoriasConsecutivas);
-                        actual.setFecha(new Date());
-                        servicioRecord.actualizar(actual);
-                        lblRecord.setText("RECORD SUPERADO");
-                        imgRecord.setImage(imagenR);
-                        recordMasAlto=victoriasConsecutivas;
-                        System.out.println("Record Actualizado en la base ");
-                    } else {
-                        System.out.println("No hay Record :(");
-                    }
+                    servicioRecord.guardarRecord(nuevo);
+                    System.out.println("Record recien insesrtado");
 
+                }else{
+                    if(victoriasConsecutivas>recordExiste.getRecord()){
+                        Record Actualizar =new Record();
+                        Actualizar.setId(recordExiste.getId());
+                        Actualizar.setJugador(jugador);
+                        Actualizar.setJuego(recordExiste.getJuego());
+                        Actualizar.setFecha(new Date());
+                        Actualizar.setRecord(victoriasConsecutivas);
+                        servicioRecord.actualizarRecord(Actualizar);
+                        System.out.println("Nuevo record");
+                    }else{
+                        System.out.println("Record NO superado :(");
+                        return;
+                    }
+                }
+
+lblRecord.setText("NUEVOOO RECORD");
+                imgRecord.setImage(imagenR);
+                recordMasAlto=victoriasConsecutivas;
             } catch (Exception e) {
                 System.out.println("Error al guardarRecord" + e.getMessage());
             }
 
+        }
+        public void cargarRecordExistente(){
+        try{
+            ArrayList<Record> todosRecord=servicioRecord.consultarRecords();
+            recordMasAlto=0;
+            for(Record r :todosRecord){
+               if (r.getJugador()!=null&&
+               r.getJugador().getId()==jugador.getId()&&
+               r.getJuego()!=null&&
+               r.getJuego().getId()==1){
+                   if(r.getRecord()>recordMasAlto)
+recordMasAlto=r.getRecord();
+               }
+            }
+
+        }catch(Exception e){
+
+        }
         }
     public void PiedraEleccion(ActionEvent event){
         Image imgP = new Image(getClass().getResource("/imagenes/newPiedras.png").toExternalForm());//imagen de resultado de usuario para piedra

@@ -21,5 +21,8 @@ public class RecordsServiceOnline implements RecordsService{
         System.out.println("Guardando record en ORACLE...");
         daoOracle.insertar(r);
     }
+    public void actualizarRecord(Record r){
+        daoOracle.actualizar(r);
+    }
 
 }

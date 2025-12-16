@@ -6,4 +6,5 @@ import java.util.ArrayList;
 public interface RecordsService {
     public ArrayList<Record> consultarRecords();
     public void guardarRecord(Record r);
+    public void actualizarRecord(Record r);
 }

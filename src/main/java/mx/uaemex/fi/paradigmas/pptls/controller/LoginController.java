@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.Application;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 import mx.uaemex.fi.paradigmas.pptls.service.JugadoresService;
+import mx.uaemex.fi.paradigmas.pptls.service.RecordsService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +33,10 @@ public class LoginController {
     private JugadoresService servicioJugadoresLocal;
     private JugadoresService servicioJugadoresOnline;
     private JugadoresService servicioJugadores;
+    private RecordsService servicioRecordsLocal;
+    private RecordsService servicioRecordsOnline;
+    private RecordsService servicioRecords;
+
 
     public void setServicioJugadoresLocal(JugadoresService s) {
         this.servicioJugadoresLocal = s;
@@ -39,13 +44,20 @@ public class LoginController {
     public void setServicioJugadoresOnline(JugadoresService s) {
         this.servicioJugadoresOnline = s;
     }
-    public void setServicioJugadores(JugadoresService s) {
-        this.servicioJugadores = s;
+
+    public void setServicioRecordsLocal(RecordsService s) {//Aunque login no los usa los debe de pasar hasta que lleguen al juego
+        this.servicioRecordsLocal = s;
     }
+
+    public void setServicioRecordsOnline(RecordsService s) {
+        this.servicioRecordsOnline = s;
+    }
+
 
     @FXML
     public void clickOnline() {
         this.servicioJugadores = this.servicioJugadoresOnline;
+        this.servicioRecords = this.servicioRecordsOnline;
         System.out.println("Utilizando Servicio ONLINE");
 
         lblModoActual.setText("Modo: Multijugador (Online)");
@@ -58,6 +70,7 @@ public class LoginController {
     @FXML
     public void clicKLocal() {
         this.servicioJugadores = this.servicioJugadoresLocal;
+        this.servicioRecords = this.servicioRecordsLocal;
         System.out.println("Utilizando Servicio LOCAL");
 
         lblModoActual.setText("Modo: Local");
@@ -120,6 +133,7 @@ public class LoginController {
             MenuController menuController = fxmlLoader.getController();
 
             menuController.setServicioJugadores(servicioJugadores);
+           menuController.setServicioRecords(servicioRecords);
             menuController.setJugador(jugadorActual);
 
             Stage stageNuevo = new Stage();
@@ -155,6 +169,7 @@ public class LoginController {
 
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 }

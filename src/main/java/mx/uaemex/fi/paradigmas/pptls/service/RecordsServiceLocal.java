@@ -16,6 +16,11 @@ public class RecordsServiceLocal implements RecordsService {
     }
 
     @Override
+    public void actualizarRecord(Record r) {
+        memoria.add(r);
+    }
+
+    @Override
     public ArrayList<Record> consultarRecords() {
 
         //como si fuera un order by puntaje  en SQL
