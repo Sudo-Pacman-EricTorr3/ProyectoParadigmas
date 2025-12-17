@@ -1,0 +1,24 @@
+/* styles.css - CORREGIDO */
+.root {
+    -fx-background-image: url("menu.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* O si prefieres usar clase: */
+.background-pane {
+    -fx-background-image: url("menu.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
+
+.semi-transparent-bg {
+    -fx-background-color: rgba(10, 10, 26, 0.7);
+    -fx-background-radius: 15;
+    -fx-border-color: #00b4d8;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+    -fx-padding: 20;
+}
