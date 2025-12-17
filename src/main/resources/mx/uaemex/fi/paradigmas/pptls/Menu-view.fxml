@@ -1,14 +1,86 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<AnchorPane xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uaemex.fi.paradigmas.pptls.controller.MenuController"
-            prefHeight="400.0" prefWidth="600.0">
+            stylesheets="@styles.css"
+            styleClass="background-pane"
+            prefHeight="600.0" prefWidth="800.0">
+
+    <VBox layoutX="20.0" layoutY="20.0" spacing="5" style="-fx-background-color: rgba(0,0,0,0.7); -fx-padding: 10; -fx-background-radius: 10;">
+        <Label fx:id="lblUsuario" text="Usuario: " style="-fx-text-fill: white; -fx-font-weight: bold;">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label fx:id="lblModo" text="Modo: " style="-fx-text-fill: #90e0ef;">
+            <font>
+                <Font size="12.0" />
+            </font>
+        </Label>
+    </VBox>
+
+    <Label layoutX="250.0" layoutY="50.0" text="PPTLS" style="-fx-text-fill: linear-gradient(to right, #00b4d8, #7209b7); -fx-font-weight: bold;">
+        <font>
+            <Font name="Arial Black" size="48.0" />
+        </font>
+    </Label>
+
+    <Label layoutX="200.0" layoutY="100.0" text="Piedra, Papel, Tijera, Lagarto, Spock" style="-fx-text-fill: white;">
+        <font>
+            <Font name="Arial" size="18.0" />
+        </font>
+    </Label>
+
+    <VBox alignment="CENTER" layoutX="300.0" layoutY="180.0" spacing="20.0" style="-fx-background-color: rgba(10, 10, 26, 0.85); -fx-background-radius: 15; -fx-border-color: #00b4d8; -fx-border-width: 2; -fx-border-radius: 15; -fx-padding: 30;">
+        <Button fx:id="btnIniciarJuego" mnemonicParsing="false" onAction="#iniciarJuego" prefHeight="45.0" prefWidth="200.0" text="Iniciar Juego" style="-fx-background-color: #00b4d8; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16;">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Button>
+
+        <Button fx:id="btnRecords" mnemonicParsing="false" onAction="#abrirRecords" prefHeight="40.0" prefWidth="200.0" text="Records Personales" style="-fx-background-color: #7209b7; -fx-text-fill: white; -fx-font-weight: bold;">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+
+        <Button fx:id="btnRanking" mnemonicParsing="false" onAction="#abrirRanking" prefHeight="40.0" prefWidth="200.0" text="Ranking Global" style="-fx-background-color: #9d4edd; -fx-text-fill: white; -fx-font-weight: bold;">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+
+        <Button fx:id="btnSalirSesion" mnemonicParsing="false" onAction="#salirSesion" prefHeight="40.0" prefWidth="200.0" text="Salir de Sesión" style="-fx-background-color: #ff9e00; -fx-text-fill: black; -fx-font-weight: bold;">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+
+        <Button fx:id="btnSalirJuego" mnemonicParsing="false" onAction="#salirJuego" prefHeight="40.0" prefWidth="200.0" text="Salir del Juego" style="-fx-background-color: #d00000; -fx-text-fill: white; -fx-font-weight: bold;">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+    </VBox>
+
+    <ImageView fitHeight="100.0" fitWidth="100.0" layoutX="650.0" layoutY="450.0" pickOnBounds="true" preserveRatio="true">
+        <Image url="@menu.png" />
+    </ImageView>
+
+    <Label layoutX="300.0" layoutY="550.0" text="© 2024 PPTLS - Universidad Autónoma del Estado de México" style="-fx-text-fill: rgba(255,255,255,0.7);">
+        <font>
+            <Font size="10.0" />
+        </font>
+    </Label>
 
 </AnchorPane>
