@@ -4,18 +4,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.paradigmas.pptls.controller.MenuController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.paradigmas.pptls.controller.MenuController">
 
     <Label fx:id="lblBienvenida" layoutX="245.0" layoutY="47.0" text="Bienvenido..." textFill="RED">
         <font>
-            <Font size="20.0"/>
+            <Font size="20.0" />
         </font>
     </Label>
 
-    <Button layoutX="64.0" layoutY="111.0"
-            text="Ver Récords (Salón de la Fama)"
-            onAction="#abrirVentanaRecords"
-            prefWidth="220.0"/>
+    <Button layoutX="64.0" layoutY="111.0" onAction="#abrirVentanaRecords" prefWidth="220.0" text="Ver Récords" />
 
 </AnchorPane>
