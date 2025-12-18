@@ -1,4 +1,5 @@
 package mx.uaemex.fi.paradigmas.pptls.model;
+
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 
 import java.sql.PreparedStatement;
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
-public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
+public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO {
 
     @Override
     public Jugador insertar(Jugador j) {
@@ -24,7 +25,7 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
             password = j.getPassword();
             correo = j.getCorreo();
 
-            if(login == null || password == null || correo == null){
+            if (login == null || password == null || correo == null) {
                 throw new RuntimeException("Informacion insuficiente, NO es posible hacer el registro");
             }
 
@@ -76,9 +77,6 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
 
     @Override
     public ArrayList<Jugador> consultar(Jugador jugador) {
-        // Los Strings son immutables es decir no cambian, solo crea una copia por eso se usa un StringBuilder
-        // Usando QBE (Query By Example)
-
         ArrayList<Jugador> encontrados;
         StringBuilder sql;
         int id;
@@ -88,33 +86,33 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
         ResultSet resultado;
         Jugador player;
 
-        try{
+        try {
             encontrados = new ArrayList<>();
             stmt = this.conexion.createStatement();
 
-            //Paso (1):
+
             sql = new StringBuilder("SELECT * FROM jugadores");
 
-            //Paso (2):
+
             id = jugador.getId();
-            if(id > 0){ //El id debe ser positivo en la BD --> Si tiene id
+            if (id > 0) {
                 sql.append(" WHERE (id=" + id);
                 numColumnas++;
             }
 
             login = jugador.getLogin();
-            if(login != null){ //Si tiene login
-                if(numColumnas != 0){ //Ya le agrego un campo
+            if (login != null) {
+                if (numColumnas != 0) {
                     sql.append(" AND login='" + login + "'");
-                }else{
+                } else {
                     sql.append(" WHERE(login='" + login + "'");
                 }
                 numColumnas++;
             }
 
             password = jugador.getPassword();
-            if (password != null){ //Si tiene password
-                if (numColumnas != 0) { //Ya le agrego un campo
+            if (password != null) {
+                if (numColumnas != 0) {
                     sql.append(" AND password='" + password + "'");
                 } else {
                     sql.append(" WHERE (password='" + password + "'");
@@ -123,8 +121,8 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
             }
 
             correo = jugador.getCorreo();
-            if (correo != null){ //Si tiene correo
-                if (numColumnas != 0) { //Ya le agrego un campo
+            if (correo != null) {
+                if (numColumnas != 0) {
                     sql.append(" AND correo='" + correo + "'");
                 } else {
                     sql.append(" WHERE (correo='" + correo + "'");
@@ -132,17 +130,17 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
                 numColumnas++;
             }
 
-            if(numColumnas != 0){
+            if (numColumnas != 0) {
                 sql.append(")");
             }
 
-            //Paso (3):
+
             resultado = stmt.executeQuery(sql.toString());
 
-            //Paso (4):
-            while(resultado.next()){
+
+            while (resultado.next()) {
                 player = new Jugador();
-                player.setId(resultado.getInt(1)); //El índice inicia en 1
+                player.setId(resultado.getInt(1));
                 player.setLogin(resultado.getString("login"));
                 player.setPassword(resultado.getString("password"));
                 player.setCorreo(resultado.getString("correo"));
@@ -151,7 +149,7 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
             }
 
             return encontrados;
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -168,14 +166,14 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
             stmt = this.conexion.createStatement();
             sql = new StringBuilder("UPDATE jugadores SET");
 
-            // 1. Password
+            //Password
             password = j.getPassword();
             if (password != null) {
                 sql.append(" password='" + password + "'");
                 numColumnas++;
             }
 
-            // 2. Correo
+            //Correo
             correo = j.getCorreo();
             if (correo != null) {
                 if (numColumnas > 0) {
@@ -185,7 +183,7 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
                 numColumnas++;
             }
 
-            // 3. Activo
+            //Activo
             activo = j.isActivo();
             if (activo) {
                 if (numColumnas > 0) {
@@ -195,12 +193,12 @@ public class JugadoresDAOPsqlImp extends AbstractSqlDAO implements JugadoresDAO{
                 numColumnas++;
             }
 
-            // 4. WHERE (Usando el login)
+            //WHERE (Usando el login)
             sql.append(" WHERE login='" + j.getLogin() + "'");
 
-            if(numColumnas > 0) {
+            if (numColumnas > 0) {
                 stmt.executeUpdate(sql.toString());
-            }else{
+            } else {
                 System.out.println("No hay campos a actualizar para el jugador: " + j.getLogin());
             }
         } catch (SQLException e) {

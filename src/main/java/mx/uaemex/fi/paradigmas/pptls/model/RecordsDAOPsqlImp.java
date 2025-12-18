@@ -1,4 +1,5 @@
 package mx.uaemex.fi.paradigmas.pptls.model;
+
 import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Juego;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
@@ -7,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
+public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO {
 
     @Override
     public Record insertar(Record r) {
@@ -36,7 +37,6 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
             if (fecha != null) {
                 pstmt.setDate(3, new java.sql.Date(fecha.getTime()));
             } else {
-                // Si viene nula, asignamos la fecha actual y actualizamos el objeto local
                 Date fechaActual = new java.util.Date();
                 pstmt.setDate(3, new java.sql.Date(fechaActual.getTime()));
                 r.setFecha(fechaActual);
@@ -71,7 +71,12 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
         Juego g;
 
         try {
-            sql = "SELECT * FROM record";
+            // Se agrega JOIN para obtener el login del jugador
+            sql = "SELECT r.id, r.puntaje, r.fecha, r.jugador_id, r.juego_id, j.login " +
+                    "FROM record r " +
+                    "JOIN jugadores j ON r.jugador_id = j.id " +
+                    "ORDER BY r.puntaje DESC";
+
             stmt = this.conexion.createStatement();
             resultado = stmt.executeQuery(sql);
             ArrayList<Record> records = new ArrayList<>();
@@ -88,10 +93,12 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
 
                 j = new Jugador();
                 j.setId(jugadorId);
+                j.setLogin(resultado.getString("login"));
                 r.setJugador(j);
 
                 g = new Juego();
                 g.setId(juegoId);
+                g.setNombre("PPTLS");
                 r.setJuego(g);
 
                 r.setFecha(fecha);
@@ -122,10 +129,7 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
             encontrados = new ArrayList<>();
             stmt = this.conexion.createStatement();
 
-            // Paso (1):
             sql = new StringBuilder("SELECT * FROM record");
-
-            // Paso (2): Construcción dinámica del WHERE
 
             id = r.getId();
             if (id > 0) {
@@ -167,11 +171,9 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
 
             fecha = r.getFecha();
             if (fecha != null) {
-                // Convertimos a Timestamp para incluir la hora exacta en la consulta
                 java.sql.Timestamp fechaSql = new java.sql.Timestamp(fecha.getTime());
 
                 if (numColumnas != 0) {
-                    // Se usan comillas simples '' para fechas en SQL
                     sql.append(" AND fecha='" + fechaSql + "'");
                 } else {
                     sql.append(" WHERE (fecha='" + fechaSql + "'");
@@ -185,7 +187,6 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
 
             resultado = stmt.executeQuery(sql.toString());
 
-            // Paso (4):
             while (resultado.next()) {
                 record = new Record();
                 record.setId(resultado.getInt("id"));
@@ -214,14 +215,16 @@ public class RecordsDAOPsqlImp extends AbstractSqlDAO implements RecordsDAO{
     public void actualizar(Record r) {
         String sql;
         PreparedStatement stmt;
-        try{
-            sql="update record set (jugador=?,juego=?,fecha=?,record=?)";
-            stmt=this.conexion.prepareStatement(sql);
+        try {
+            sql = "UPDATE record SET jugador_id=?, juego_id=?, fecha=?, puntaje=? WHERE id=?";
+            stmt = this.conexion.prepareStatement(sql);
+
             stmt.setInt(1, r.getJugador().getId());
-            stmt.setInt(2,r.getJuego().getId());
-            stmt.setDate(3,new java.sql.Date(r.getFecha().getTime()));
-            stmt.setInt(4,r.getRecord());
-            stmt.setInt(5,r.getId());
+            stmt.setInt(2, r.getJuego().getId());
+            stmt.setDate(3, new java.sql.Date(r.getFecha().getTime()));
+            stmt.setInt(4, r.getRecord());
+            stmt.setInt(5, r.getId());
+
             stmt.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
