@@ -1,12 +1,15 @@
 package mx.uaemex.fi.paradigmas.pptls.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Juego;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
@@ -19,6 +22,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 public class GameController {
@@ -60,6 +64,10 @@ public class GameController {
     private ImageView imgRecord;
     @FXML
     private Button Reinicio;
+    @FXML
+    private Button btnSalir;
+    @FXML
+    private Label Vconsecutivas;
 
     @FXML
     private Label lblRecord;
@@ -92,7 +100,7 @@ public void setJugador(Jugador jugador){
     public void ActualizarLabelsV(){
         lblVictoriaJ.setText(String.valueOf(victoriaJugador));
         lblVictoriasPC.setText(String.valueOf(victoriaPc));
-
+        Vconsecutivas.setText(String.valueOf(victoriasConsecutivas));
     }
     private void guardarNuevoRecord(){
         if(victoriasConsecutivas<=recordMasAlto) return;
@@ -185,11 +193,13 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgPPrs);
             EleccionPc.setText("PC escogio Papel");
             lblResultado.setText("Perdiste,su papel envuelve tu piedra ");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if(pcJugada==4){
             imgPC.setImage(imgSrs);
             EleccionPc.setText("PC escogio Spock");
             lblResultado.setText("Perdiste,Spock vaporiza tu piedra ");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if(pcJugada==5){
             imgPC.setImage(imgLrs);
@@ -219,6 +229,7 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgTrs);
             EleccionPc.setText("PC escogio Tijeras");
             lblResultado.setText("Perdiste,sus tijeras cortan tu papel");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if(pcJugada==3){
             imgPC.setImage(imgPp);
@@ -235,6 +246,7 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgLrs);
             EleccionPc.setText("PC escogio Lagarto");
             lblResultado.setText("Perdiste,su lagarto devora papel ");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }
         ActualizarLabelsV();
@@ -250,6 +262,7 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgPrs);
             EleccionPc.setText("PC escogio Piedra");
             lblResultado.setText("Perdiste,su piedra aplasta tus tijeras ");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if (pcJugada==2){
             imgPC.setImage(imgTrs);
@@ -266,6 +279,7 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgSrs);
             EleccionPc.setText("PC escogio Spock");
             lblResultado.setText("Perdiste ,Spock rompe tus tijeras ");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if(pcJugada==5){
             imgPC.setImage(imgLrs);
@@ -302,6 +316,7 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgPPrs);
             EleccionPc.setText("PC escogio Papel");
             lblResultado.setText("Perdiste,su papel desautoriza Spock");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if(pcJugada==4){
             imgPC.setImage(imgSrs);
@@ -311,6 +326,7 @@ recordMasAlto=r.getRecord();
             imgPC.setImage(imgLrs);
             EleccionPc.setText("PC escogio Lagarto");
             lblResultado.setText("Perdiste,su lagarto envenena a tu spock");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }
         ActualizarLabelsV();
@@ -321,16 +337,18 @@ recordMasAlto=r.getRecord();
         //calculamos tiro de la pc,ya sabemos que nosotros escogimos Lagarto
         int pcJugada=(int)(Math.random()*5)+1;
         //determinar el ganador
-        //1.Piedra,2.Tijera,3.Papel,4.Smock,5.Lagarto
+        //1.Piedra,2.Tijera,3.Papel,4.Spock,5.Lagarto
         if(pcJugada==1){
             imgPC.setImage(imgPrs);
             EleccionPc.setText("PC escogio Piedra");
             lblResultado.setText("Perdiste,su piedra aplasta tu lagarto");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if (pcJugada==2){
             imgPC.setImage(imgTrs);
             EleccionPc.setText("PC escogio Tijeras");
             lblResultado.setText("Perdiste,sus tijeras decapitan tu lagarto");
+            victoriasConsecutivas=0;
             victoriaPc++;
         }else if(pcJugada==3){
             imgPC.setImage(imgPPrs);
@@ -358,11 +376,42 @@ recordMasAlto=r.getRecord();
         victoriaJugador=0;
         victoriaPc=0;
         victoriasConsecutivas=0;
+        imgJugador.setImage(null);
+        imgPC.setImage(null);
         lblRecord.setText("");
         imgRecord.setImage(null);
         ActualizarLabelsV();
 
     }
-    //Agregar boton para regresar al menu o terminar partida
-}
+    public void Salir(ActionEvent event){
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar salida");
+        confirmacion.setHeaderText("¿Salir al menú principal?");
+        confirmacion.setContentText("Se perderá el progreso de la partida actual.");
+        Optional<ButtonType> resultado = confirmacion.showAndWait();
+
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            cerrarVentanaJuego();
+        }
+    }
+    private void cerrarVentanaJuego() {
+        try {
+            System.out.println("=== RESUMEN DE PARTIDA ===");
+            System.out.println("Victorias: " + victoriaJugador);
+            System.out.println("Derrotas: " + victoriaPc);
+            System.out.println("Victorias consecutivas: " + victoriasConsecutivas);
+            System.out.println("Record personal: " + recordMasAlto);
+
+            Stage stage = (Stage) btnSalir.getScene().getWindow();
+            stage.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
+    }
+
+
+
 
