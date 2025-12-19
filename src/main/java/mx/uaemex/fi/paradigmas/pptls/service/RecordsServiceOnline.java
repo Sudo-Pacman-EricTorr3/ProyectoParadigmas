@@ -6,26 +6,37 @@ import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
 import java.util.ArrayList;
 
 public class RecordsServiceOnline implements RecordsService {
-    private RecordsDAO daoOracle; //este es para que nos conectemos al a db o el servicio que se vaya a ocupar
+
+    private RecordsDAO dao;
+
+    @Override
+    public ArrayList<Record> consultar() {
+        return dao.consultar();
+    }
+
+    @Override
+    public ArrayList<Record> consultar(Record r) {
+        return dao.consultar(r);
+    }
+
+    @Override
+    public Record insertar(Record r) {
+        return dao.insertar(r);
+    }
+
+    @Override
+    public Record actualizar(Record r) {
+        dao.actualizar(r);
+        return dao.consultar(r).get(0);
+    }
+
+    @Override
+    public boolean borrar(Record r) {
+        dao.borrar(r);
+        return true;
+    }
 
     public void setDao(RecordsDAO dao) {
-        this.daoOracle = dao;
+        this.dao = dao;
     }
-
-    @Override
-    public ArrayList<Record> consultarRecords() {
-        System.out.println("Consultando records desde ORACLE...");
-        return daoOracle.consultar();
-    }
-
-    @Override
-    public void guardarRecord(Record r) {
-        System.out.println("Guardando record en ORACLE...");
-        daoOracle.insertar(r);
-    }
-
-    public void actualizarRecord(Record r) {
-        daoOracle.actualizar(r);
-    }
-
 }

@@ -6,11 +6,9 @@ import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.controller.LoginController;
 import mx.uaemex.fi.paradigmas.pptls.model.JugadoresDAOLocalImp;
 import mx.uaemex.fi.paradigmas.pptls.model.JugadoresDAOPsqlImp;
+import mx.uaemex.fi.paradigmas.pptls.model.RecordsDAOLocalImp;
 import mx.uaemex.fi.paradigmas.pptls.model.RecordsDAOPsqlImp;
-import mx.uaemex.fi.paradigmas.pptls.service.JugadoresServiceLocal;
-import mx.uaemex.fi.paradigmas.pptls.service.JugadoresServiceOnline;
-import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceLocal;
-import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceOnline;
+import mx.uaemex.fi.paradigmas.pptls.service.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -28,6 +26,7 @@ public class Application extends javafx.application.Application {
 
         JugadoresServiceLocal servicioJugadoresLocal = new JugadoresServiceLocal();
         JugadoresServiceOnline servicioJugadoresOnline = new JugadoresServiceOnline();
+
         RecordsServiceLocal servicioRecordsLocal = new RecordsServiceLocal();
         RecordsServiceOnline servicioRecordsOnline = new RecordsServiceOnline();
 
@@ -37,12 +36,16 @@ public class Application extends javafx.application.Application {
             JugadoresDAOPsqlImp daoJugadoresOnline = new JugadoresDAOPsqlImp();
             daoJugadoresOnline.setConexion(conn);
             servicioJugadoresOnline.setDao(daoJugadoresOnline);
-            RecordsDAOPsqlImp daoRecordsOnline=new RecordsDAOPsqlImp();
-            daoRecordsOnline.setConexion(conn);
-            servicioRecordsOnline.setDao(daoRecordsOnline);
+
             JugadoresDAOLocalImp daoJugadoresLocal = new JugadoresDAOLocalImp();
             servicioJugadoresLocal.setDao(daoJugadoresLocal);
 
+            RecordsDAOPsqlImp daoRecordsOnline = new RecordsDAOPsqlImp();
+            daoRecordsOnline.setConexion(conn);
+            servicioRecordsOnline.setDao(daoRecordsOnline);
+
+            RecordsDAOLocalImp daoRecordsLocal = new RecordsDAOLocalImp();
+            servicioRecordsLocal.setDao(daoRecordsLocal);
 
             System.out.println("Conexión a la BD exitosa.");
 
@@ -59,10 +62,13 @@ public class Application extends javafx.application.Application {
         stage.show();
 
         LoginController = fxmlLoader.getController();
+
         LoginController.setServicioJugadoresLocal(servicioJugadoresLocal);
         LoginController.setServicioJugadoresOnline(servicioJugadoresOnline);
+
         LoginController.setServicioRecordsLocal(servicioRecordsLocal);
         LoginController.setServicioRecordsOnline(servicioRecordsOnline);
+
         LoginController.clickOnline();
     }
 

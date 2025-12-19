@@ -1,121 +1,61 @@
 package mx.uaemex.fi.paradigmas.pptls.controller;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.Application;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
-import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
 import mx.uaemex.fi.paradigmas.pptls.service.JugadoresService;
 import mx.uaemex.fi.paradigmas.pptls.service.RecordsService;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.Optional;
 
 public class MenuController {
 
-
-    @FXML
-    private Button btnIniciarJuego;
-    @FXML
-    private Button btnRecords;
-    @FXML
-    private Button btnRanking;
-    @FXML
-    private Button btnSalirSesion;
-    @FXML
-    private Button btnSalirJuego;
-    @FXML
-    private Label lblUsuario;
-    @FXML
-    private Label lblModo;
-
-
-    @FXML
-    private TableView<Record> tblRecords;
-    @FXML
-    private TableColumn<Record, String> colJugador;
-    @FXML
-    private TableColumn<Record, String> colJuego;
-    @FXML
-    private TableColumn<Record, Number> colPuntaje;
-    @FXML
-    private TableColumn<Record, Date> colFecha;
-
+    @FXML private Label lblUsuario;
+    @FXML private Label lblModo;
+    @FXML private Button btnIniciarJuego;
+    @FXML private Button btnRecords;
+    @FXML private Button btnRanking;
+    @FXML private Button btnCerrarSesion;
+    @FXML private Button btnSalirJuego;
 
     private Jugador jugadorActual;
+
+    private JugadoresService servicioJugadoresLocal;
+    private JugadoresService servicioJugadoresOnline;
     private JugadoresService servicioJugadores;
+    private RecordsService servicioRecordsLocal;
+    private RecordsService servicioRecordsOnline;
     private RecordsService servicioRecords;
 
+    public void setServicioJugadoresLocal(JugadoresService s) { this.servicioJugadoresLocal = s; }
+    public void setServicioJugadoresOnline(JugadoresService s) { this.servicioJugadoresOnline = s; }
 
-    @FXML
-    public void initialize() {
-
-        if (btnIniciarJuego != null) {
-            configurarEfectosBotones();
-        }
-
-
-        if (colJugador != null) {
-            configurarColumnasTabla();
-        }
-    }
-
-
-    private void configurarColumnasTabla() {
-        colJugador.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getJugador().getLogin()));
-        colJuego.setCellValueFactory(cellData -> new SimpleStringProperty("PPTLS"));
-        colPuntaje.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getRecord()));
-        colFecha.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getFecha()));
-    }
-
-    private void cargarDatosTabla() {
-        try {
-            if (servicioRecords != null) {
-                var listaRecords = servicioRecords.consultarRecords();
-                ObservableList<Record> datos = FXCollections.observableArrayList(listaRecords);
-                tblRecords.setItems(datos);
-            }
-        } catch (Exception e) {
-            System.out.println("Error al cargar datos en la tabla: " + e.getMessage());
-        }
-    }
-
+    public void setServicioRecordsLocal(RecordsService s) { this.servicioRecordsLocal = s; }
+    public void setServicioRecordsOnline(RecordsService s) { this.servicioRecordsOnline = s; }
 
     public void setJugador(Jugador jugador) {
         this.jugadorActual = jugador;
-        actualizarInformacionUsuario();
-    }
-
-    public void setServicioJugadores(JugadoresService servicio) {
-        this.servicioJugadores = servicio;
-        actualizarInformacionUsuario();
-    }
-
-    public void setServicioRecords(RecordsService servicio) {
-        this.servicioRecords = servicio;
-        if (tblRecords != null && servicioRecords != null) {
-            cargarDatosTabla();
+        if (lblUsuario != null && jugador != null) {
+            lblUsuario.setText("Usuario: " + jugador.getLogin());
         }
     }
 
-    private void actualizarInformacionUsuario() {
+    public void setServicioRecords(RecordsService s) { this.servicioRecords = s; }
 
-        if (lblUsuario != null && jugadorActual != null) {
-            lblUsuario.setText("Usuario: " + jugadorActual.getLogin());
-        }
-        if (lblModo != null && servicioJugadores != null) {
-            String nombreServicio = servicioJugadores.getClass().getSimpleName();
-            if (nombreServicio.contains("Online") || nombreServicio.contains("Psql")) {
+    public void setServicioJugadores(JugadoresService s) {
+        this.servicioJugadores = s;
+        if (lblModo != null) {
+            if (s == this.servicioJugadoresOnline) {
                 lblModo.setText("Modo: Multijugador (Online)");
             } else {
                 lblModo.setText("Modo: Local");
@@ -123,154 +63,140 @@ public class MenuController {
         }
     }
 
-
     @FXML
     protected void iniciarJuego() {
         try {
-            Stage stageActual = (Stage) btnIniciarJuego.getScene().getWindow();
-            stageActual.close();
+            FXMLLoader loader = new FXMLLoader(Application.class.getResource("Game-view.fxml"));
+            Parent root = loader.load();
 
-            FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Game-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
+            GameController gameController = loader.getController();
 
-            GameController gameController = fxmlLoader.getController();
-            gameController.setJugador(jugadorActual);
-            gameController.setServicioRecord(servicioRecords);
+            Stage stageMenu = (Stage) btnIniciarJuego.getScene().getWindow();
 
-            Stage stageNuevo = new Stage();
-            stageNuevo.setTitle("PPTLS - Juego");
-            stageNuevo.setScene(scene);
-            stageNuevo.setResizable(false);
-            stageNuevo.show();
+            gameController.setDatos(this.jugadorActual, this.servicioRecords, stageMenu);
+
+            Stage stageJuego = new Stage();
+            stageJuego.setTitle("PPTLS - Jugando: " + jugadorActual.getLogin());
+            stageJuego.setScene(new Scene(root));
+            stageJuego.setMaximized(true);
+            stageJuego.show();
+
+            stageMenu.hide();
 
         } catch (IOException e) {
-            mostrarError("Error al cargar el juego: " + e.getMessage());
             e.printStackTrace();
+            mostrarAlerta("Error al cargar el juego: " + e.getMessage());
         }
+    }
+
+    private void mostrarAlerta(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText(msg);
+        alert.show();
     }
 
     @FXML
     protected void abrirRecords() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Records.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
+            // 1. Cargar la vista de Récords
+            FXMLLoader loader = new FXMLLoader(Application.class.getResource("Records-view.fxml"));
+            Parent root = loader.load();
 
+            // 2. Obtener el controlador
+            RecordsController controller = loader.getController();
 
-            MenuController recordsController = fxmlLoader.getController();
-            recordsController.setServicioRecords(this.servicioRecords);
-            recordsController.setJugador(this.jugadorActual);
+            // 3. Obtener referencia del menú actual para ocultarlo
+            Stage stageMenu = (Stage) btnRecords.getScene().getWindow();
 
-            Stage stage = new Stage();
-            stage.setTitle("Mis Récords - PPTLS");
-            stage.setScene(scene);
-            stage.show();
+            // 4. Pasar datos (Jugador, Servicio y el Menú para volver)
+            controller.inicializarDatos(this.jugadorActual, this.servicioRecords, stageMenu);
 
-        } catch (IOException e) {
-            mostrarError("Error al abrir records: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+            // 5. Configurar y mostrar ventana de Récords
+            Stage stageRecords = new Stage();
+            stageRecords.setTitle("Mis Récords - PPTLS");
+            stageRecords.setScene(new Scene(root));
+            stageRecords.show();
 
-    @FXML
-    public void cerrarVentana(ActionEvent event) {
-        Node source = (Node) event.getSource();
-        Stage stage = (Stage) source.getScene().getWindow();
-        stage.close();
-    }
-
-
-    @FXML
-    protected void salirSesion() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar salida");
-        alert.setHeaderText("¿Cerrar sesión?");
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) volverAlLogin();
-        });
-    }
-
-    @FXML
-    protected void salirJuego() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Salir");
-        alert.setHeaderText("¿Salir de la aplicación?");
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.OK) System.exit(0);
-        });
-    }
-
-    private void volverAlLogin() {
-        try {
-            Stage stage = (Stage) btnIniciarJuego.getScene().getWindow();
-            FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Login-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-            stage.setTitle("Iniciar Sesión");
-            stage.setScene(scene);
-
-
-            LoginController loginController = fxmlLoader.getController();
-            loginController.setServicioJugadoresLocal(servicioJugadores);
-
+            // 6. Ocultar el menú
+            stageMenu.hide();
 
         } catch (IOException e) {
             e.printStackTrace();
+            mostrarAlerta("No se pudo cargar la ventana de récords: " + e.getMessage());
         }
-    }
-
-    private void configurarEfectosBotones() {
-        Button[] botones = {btnIniciarJuego, btnRecords, btnRanking, btnSalirSesion, btnSalirJuego};
-        for (Button btn : botones) {
-            if (btn != null) {
-                btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-cursor: hand;"));
-                btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: #2d3748; -fx-text-fill: white; -fx-cursor: default;"));
-            }
-        }
-    }
-
-    private void mostrarError(String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
     }
 
     @FXML
     protected void abrirRanking() {
         try {
-            //Pedimos la lista que ya viene ordenada por puntaje DESC gracias al DAO
-            var listaRecords = servicioRecords.consultarRecords();
+            FXMLLoader loader = new FXMLLoader(Application.class.getResource("Ranking-view.fxml"));
+            Parent root = loader.load();
 
-            StringBuilder textoTop10 = new StringBuilder();
-            int lugar = 1;
+            RankingController controller = loader.getController();
+            Stage stageMenu = (Stage) btnRanking.getScene().getWindow();
 
-            //Recorremos la lista y tomamos solo los primeros 10
-            for (Record r : listaRecords) {
-                if (lugar > 10) break; //si pasamos del 10, nos detenemos
+            // Pasamos solo el servicio y la referencia del menú
+            controller.inicializarDatos(this.servicioRecords, stageMenu);
 
-                String nombre = "Desconocido";
-                if (r.getJugador() != null && r.getJugador().getLogin() != null) {
-                    nombre = r.getJugador().getLogin();
-                }
+            Stage stageRanking = new Stage();
+            stageRanking.setTitle("Ranking Global - PPTLS");
+            stageRanking.setScene(new Scene(root));
+            stageRanking.show();
 
-                textoTop10.append("#").append(lugar).append(" ")
-                        .append(nombre)
-                        .append(" - ")
-                        .append(r.getRecord()).append(" pts\n");
+            stageMenu.hide();
 
-                lugar++;
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("No se pudo cargar el Ranking: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    protected void salirJuego() {
+        Platform.exit();
+    }
+
+    @FXML
+    protected void cerrarSesion() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Cerrar Sesión");
+        alert.setHeaderText(null);
+        alert.setContentText("¿Estás seguro que deseas cerrar sesión?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            volverAlLogin();
+        }
+    }
+
+    private void volverAlLogin() {
+        try {
+            Stage stage = (Stage) btnCerrarSesion.getScene().getWindow();
+            FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Login-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            LoginController loginController = fxmlLoader.getController();
+
+            loginController.setServicioJugadoresLocal(this.servicioJugadoresLocal);
+            loginController.setServicioJugadoresOnline(this.servicioJugadoresOnline);
+
+            loginController.setServicioRecordsLocal(this.servicioRecordsLocal);
+            loginController.setServicioRecordsOnline(this.servicioRecordsOnline);
+
+            if (this.servicioJugadores == this.servicioJugadoresOnline) {
+                loginController.clickOnline();
+            } else {
+                loginController.clicKLocal();
             }
 
-            if (textoTop10.length() == 0) {
-                textoTop10.append("Aún no hay récords registrados.");
-            }
+            stage.setTitle("Iniciar Sesión");
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.show();
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Ranking Global");
-            alert.setHeaderText("🏆 Top 10 Mejores Jugadores 🏆");
-            alert.setContentText(textoTop10.toString());
-            alert.showAndWait();
-
-        } catch (Exception e) {
-            System.out.println("Error al cargar ranking: " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error al intentar regresar al Login: " + e.getMessage());
         }
     }
 }

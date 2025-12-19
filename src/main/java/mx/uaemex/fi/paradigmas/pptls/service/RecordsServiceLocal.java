@@ -1,38 +1,42 @@
 package mx.uaemex.fi.paradigmas.pptls.service;
 
+import mx.uaemex.fi.paradigmas.pptls.model.RecordsDAO;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class RecordsServiceLocal implements RecordsService {
-    //esta lista vivirá en la memoria RAM mientras el programa esté abierto
-    //entonces si cerramos el programa se borrará
-    private ArrayList<Record> memoria;
 
-    public RecordsServiceLocal() {
-        this.memoria = new ArrayList<>();
+    private RecordsDAO dao;
+
+    @Override
+    public ArrayList<Record> consultar() {
+        return dao.consultar();
     }
 
     @Override
-    public void actualizarRecord(Record r) {
-        memoria.add(r);
+    public ArrayList<Record> consultar(Record r) {
+        return dao.consultar(r);
     }
 
     @Override
-    public ArrayList<Record> consultarRecords() {
-
-        //como si fuera un order by puntaje  en SQL
-        memoria.sort((r1, r2) -> Integer.compare(r2.getRecord(), r1.getRecord()));
-
-        return memoria;
+    public Record insertar(Record r) {
+        return dao.insertar(r);
     }
 
     @Override
-    public void guardarRecord(Record r) {
-        //lo agregamos a la lista
-        memoria.add(r);
-        System.out.println("Récord guardado en memoria RAM (Local).");
+    public Record actualizar(Record r) {
+        dao.actualizar(r);
+        return dao.consultar(r).get(0);
+    }
+
+    @Override
+    public boolean borrar(Record r) {
+        dao.borrar(r);
+        return true;
+    }
+
+    public void setDao(RecordsDAO dao) {
+        this.dao = dao;
     }
 }

@@ -1,10 +1,10 @@
 package mx.uaemex.fi.paradigmas.pptls.model.data;
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class Record extends ElementoConID implements Data{
     private Jugador jugador;
     private Juego juego;
-    private Date fecha;
+    private Timestamp fecha;
     private int record;
 
     public Record() {
@@ -30,11 +30,11 @@ public class Record extends ElementoConID implements Data{
         this.juego = juego;
     }
 
-    public Date getFecha() {
+    public Timestamp getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(Timestamp fecha) {
         this.fecha = fecha;
     }
 

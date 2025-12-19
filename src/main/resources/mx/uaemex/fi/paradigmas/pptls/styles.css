@@ -1,24 +1,83 @@
-/* styles.css - CORREGIDO */
+/*Ventana del menu principal*/
 .root {
-    -fx-background-image: url("menu.png");
+    -fx-background-image: url("imagenes/menu.png");
     -fx-background-size: cover;
     -fx-background-position: center center;
     -fx-background-repeat: no-repeat;
 }
 
-/* O si prefieres usar clase: */
-.background-pane {
-    -fx-background-image: url("menu.png");
-    -fx-background-size: cover;
-    -fx-background-position: center center;
-    -fx-background-repeat: no-repeat;
-}
-
-.semi-transparent-bg {
-    -fx-background-color: rgba(10, 10, 26, 0.7);
-    -fx-background-radius: 15;
+.contenedor-botones {
+    -fx-background-color: rgba(10, 10, 26, 0.85);
+    -fx-background-radius: 20;
     -fx-border-color: #00b4d8;
     -fx-border-width: 2;
-    -fx-border-radius: 15;
-    -fx-padding: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 180, 216, 0.4), 20, 0, 0, 0);
+}
+
+.info-container {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 0 0 15 0;
+    -fx-border-color: #00b4d8;
+    -fx-border-width: 0 2 2 0;
+    -fx-border-radius: 0 0 15 0;
+    -fx-padding: 10 20 10 10;
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial";
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.6), 5, 0, 0, 1);
+}
+
+.button:pressed {
+    -fx-translate-y: 1;
+    -fx-opacity: 0.8;
+}
+
+#btnIniciarJuego {
+    -fx-background-color: #00b4d8;
+    -fx-font-size: 16px;
+}
+#btnIniciarJuego:hover {
+    -fx-background-color: #48cae4;
+    -fx-effect: dropshadow(gaussian, #48cae4, 10, 0.5, 0, 0);
+}
+
+#btnRecords {
+    -fx-background-color: #7209b7;
+}
+#btnRecords:hover {
+    -fx-background-color: #8a2be2;
+    -fx-effect: dropshadow(gaussian, #8a2be2, 10, 0.5, 0, 0);
+}
+
+#btnRanking {
+    -fx-background-color: #9d4edd;
+}
+#btnRanking:hover {
+    -fx-background-color: #c77dff;
+    -fx-effect: dropshadow(gaussian, #c77dff, 10, 0.5, 0, 0);
+}
+
+#btnCerrarSesion {
+    -fx-background-color: #ff9e00;
+    -fx-text-fill: black;
+}
+#btnCerrarSesion:hover {
+    -fx-background-color: #ffb700;
+    -fx-effect: dropshadow(gaussian, #ffb700, 10, 0.5, 0, 0);
+}
+
+#btnSalirJuego {
+    -fx-background-color: #d00000;
+}
+#btnSalirJuego:hover {
+    -fx-background-color: #ff0000;
+    -fx-effect: dropshadow(gaussian, #ff0000, 10, 0.5, 0, 0);
 }

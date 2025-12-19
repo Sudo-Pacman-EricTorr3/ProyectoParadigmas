@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.Application;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 import mx.uaemex.fi.paradigmas.pptls.service.JugadoresService;
+import mx.uaemex.fi.paradigmas.pptls.service.RecordsService;
 
 import java.io.IOException;
 
@@ -36,17 +37,35 @@ public class RegisterController {
     private JugadoresService servicioJugadoresLocal;
     private JugadoresService servicioJugadores;
 
+    private RecordsService servicioRecordsLocal;
+    private RecordsService servicioRecordsOnline;
+    private RecordsService servicioRecords;
+
+    public void setServicioJugadores(JugadoresService s) {
+        this.servicioJugadores = s;
+    }
     public void setServicioJugadoresOnline(JugadoresService s) {
         this.servicioJugadoresOnline = s;
     }
-
     public void setServicioJugadoresLocal(JugadoresService s) {
         this.servicioJugadoresLocal = s;
+    }
+
+    public void setServicioRecords(RecordsService s) {
+        this.servicioRecords = s;
+    }
+    public void setServicioRecordsOnline(RecordsService s) {
+        this.servicioRecordsOnline = s;
+    }
+    public void setServicioRecordsLocal(RecordsService s) {
+        this.servicioRecordsLocal = s;
     }
 
     @FXML
     protected void clickOnline() {
         this.servicioJugadores = servicioJugadoresOnline;
+        this.servicioRecords = servicioRecordsOnline;
+
         System.out.println("Registrando en Servicio ONLINE");
 
         lblModoActual.setText("Registrando en: Servicio Online (Multijugador)");
@@ -59,6 +78,8 @@ public class RegisterController {
     @FXML
     protected void clicKLocal() {
         this.servicioJugadores = servicioJugadoresLocal;
+        this.servicioRecords = servicioRecordsLocal;
+
         System.out.println("Registrando en Servicio LOCAL");
 
         lblModoActual.setText("Registrando en: Servicio Local");
@@ -109,7 +130,16 @@ public class RegisterController {
             FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Menu-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
             MenuController menuController = fxmlLoader.getController();
+
             menuController.setJugador(jugadorActual);
+
+            menuController.setServicioJugadoresLocal(servicioJugadoresLocal);
+            menuController.setServicioJugadoresOnline(servicioJugadoresOnline);
+
+            menuController.setServicioRecordsLocal(servicioRecordsLocal);
+            menuController.setServicioRecordsOnline(servicioRecordsOnline);
+
+            menuController.setServicioRecords(servicioRecords);
             menuController.setServicioJugadores(servicioJugadores);
 
             Stage stageNuevo = new Stage();
@@ -135,8 +165,12 @@ public class RegisterController {
             stage.setScene(scene);
 
             LoginController loginController = fxmlLoader.getController();
+
             loginController.setServicioJugadoresOnline(servicioJugadoresOnline);
             loginController.setServicioJugadoresLocal(servicioJugadoresLocal);
+
+            loginController.setServicioRecordsLocal(servicioRecordsLocal);
+            loginController.setServicioRecordsOnline(servicioRecordsOnline);
 
             if (this.servicioJugadores == this.servicioJugadoresOnline) {
                 loginController.clickOnline();

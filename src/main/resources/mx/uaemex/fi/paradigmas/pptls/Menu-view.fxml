@@ -1,13 +1,72 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uaemex.fi.paradigmas.pptls.controller.MenuController">
-    <Label fx:id="lblBienvenida" layoutX="245.0" layoutY="47.0" text="Bienvenido..." textFill="#1f801b">
-        <font>
-            <Font size="20.0" />
-        </font>
-    </Label>
+<AnchorPane prefHeight="600.0" prefWidth="800.0"
+            stylesheets="@styles.css"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uaemex.fi.paradigmas.pptls.controller.MenuController">
+
+    <VBox alignment="CENTER" spacing="25.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+
+        <VBox alignment="CENTER" spacing="5.0">
+            <Label style="-fx-text-fill: linear-gradient(to right, #00b4d8, #7209b7); -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0, 0, 0);" text="PPTLS">
+                <font>
+                    <Font name="Arial Black" size="60.0" />
+                </font>
+            </Label>
+
+            <Label style="-fx-text-fill: white; -fx-effect: dropshadow(one-pass-box, black, 5, 0.5, 0, 0);" text="Piedra, Papel, Tijera, Lagarto, Spock">
+                <font>
+                    <Font name="Arial" size="22.0" />
+                </font>
+            </Label>
+        </VBox>
+
+        <VBox alignment="CENTER" maxWidth="380.0" spacing="15.0" styleClass="contenedor-botones">
+
+            <Button fx:id="btnIniciarJuego" mnemonicParsing="false" onAction="#iniciarJuego" prefHeight="50.0" prefWidth="280.0" text="Iniciar Juego" />
+
+            <Button fx:id="btnRecords" mnemonicParsing="false" onAction="#abrirRecords" prefHeight="45.0" prefWidth="280.0" text="Récords Personales" />
+
+            <Button fx:id="btnRanking" mnemonicParsing="false" onAction="#abrirRanking" prefHeight="45.0" prefWidth="280.0" text="Ranking Global" />
+
+            <Button fx:id="btnCerrarSesion" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="45.0" prefWidth="280.0" text="Cerrar Sesión" />
+
+            <Button fx:id="btnSalirJuego" mnemonicParsing="false" onAction="#salirJuego" prefHeight="45.0" prefWidth="280.0" text="Salir" />
+
+        </VBox>
+
+        <Label style="-fx-text-fill: rgba(255,255,255,0.6);" text="© 2025 PPTLS - UAEMex">
+            <font>
+                <Font size="11.0" />
+            </font>
+            <VBox.margin>
+                <Insets top="10.0" />
+            </VBox.margin>
+        </Label>
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="info-container" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <Label fx:id="lblUsuario" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Usuario: ...">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+
+        <Label style="-fx-text-fill: #555;" text="|" />
+
+        <Label fx:id="lblModo" style="-fx-text-fill: #00b4d8; -fx-font-style: italic;" text="Modo: ...">
+            <font>
+                <Font size="13.0" />
+            </font>
+        </Label>
+    </HBox>
+
 </AnchorPane>

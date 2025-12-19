@@ -1,11 +1,10 @@
 package mx.uaemex.fi.paradigmas.pptls.controller;
 
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -13,405 +12,209 @@ import javafx.stage.Stage;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Juego;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Jugador;
 import mx.uaemex.fi.paradigmas.pptls.model.data.Record;
-import mx.uaemex.fi.paradigmas.pptls.service.JugadoresService;
-import mx.uaemex.fi.paradigmas.pptls.service.JugadoresServiceLocal;
 import mx.uaemex.fi.paradigmas.pptls.service.RecordsService;
-import mx.uaemex.fi.paradigmas.pptls.service.RecordsServiceLocal;
 
-import java.sql.Connection;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
 
 public class GameController {
 
+    @FXML private AnchorPane ApJuegoManos;
+    @FXML private ImageView bgImage;
 
-    @FXML
-    private Label Login;
-    @FXML
-    private AnchorPane ApJuegoManos;
-    @FXML
-    private Label EleccionPc;
+    @FXML private Label lblUsuario;
+    @FXML private Label lblRachaActual;
+    @FXML private Label lblRecordMaximo;
 
-    @FXML
-    private Button btnLagarto;
+    @FXML private ImageView imgJugador;
+    @FXML private Label etiquetaEleccionJugador;
 
-    @FXML
-    private Button btnPiedra;
+    @FXML private ImageView imgPC;
+    @FXML private Label etiquetaEleccionPC;
+    @FXML private Label EleccionPc;
 
-    @FXML
-    private Button btnPpael;
+    @FXML private Label lblResultado;
+    @FXML private Label lblDetalleResultado;
+    @FXML private ImageView imgRecord;
 
-    @FXML
-    private Button btnSpock;
-
-    @FXML
-    private Button btnTijeras;
-
-    @FXML
-    private Label lblResultado;
-    @FXML
-    private ImageView imgJugador;
-    @FXML
-    private Label lblVictoriaJ;
-    @FXML
-    private Label lblVictoriasPC;
-    @FXML
-    private ImageView imgPC;
-    @FXML
-    private ImageView imgRecord;
-    @FXML
-    private Button Reinicio;
-    @FXML
-    private Button btnSalir;
-    @FXML
-    private Label Vconsecutivas;
-
-    @FXML
-    private Label lblRecord;
-    private int victoriaJugador=0;
-    private int victoriaPc=0;
-    private int victoriasConsecutivas=0;
-    private int recordMasAlto=0;
     private Jugador jugadorActual;
-    private Juego juegoActual;
-    private Jugador jugador;
-    private JugadoresService servicioLocal;
-    private RecordsService servicioRecord;
-    public void setServicioLocal(JugadoresService s) {
-        this.servicioLocal = s;
+    private RecordsService servicioRecords;
+    private Stage stageMenu;
+    private Record ultimoRecord;
+
+    private int rachaActual = 0;
+    private final int ID_JUEGO = 1;
+
+    private final int PIEDRA = 1;
+    private final int TIJERAS = 2;
+    private final int PAPEL = 3;
+    private final int SPOCK = 4;
+    private final int LAGARTO = 5;
+
+    public void setDatos(Jugador jugador, RecordsService servicio, Stage menuStage) {
+        this.jugadorActual = jugador;
+        this.servicioRecords = servicio;
+        this.stageMenu = menuStage;
+
+        if (lblUsuario != null) lblUsuario.setText("Jugador: " + jugador.getLogin());
+
+        ajustarFondo();
+        cargarUltimoRecord();
     }
-    public void setServicioRecord(RecordsService ServicioR){
-        this.servicioRecord=ServicioR;
-    };
-public void setJugador(Jugador jugador){
 
-    this.jugador=jugador;
-    cargarRecordExistente();
-}
-    Image imgPrs = new Image(getClass().getResource("/imagenes/PiedraRes.png").toExternalForm());//imagen de resultado de la pc para piedra
-    Image imgTrs = new Image(getClass().getResource("/imagenes/TijerasRes.png").toExternalForm());//imagen de resultado de la pc para tijeras
-    Image imgPPrs = new Image(getClass().getResource("/imagenes/PapelRes.png").toExternalForm());//imagen de resultado de la pc para papel
-    Image imgLrs = new Image(getClass().getResource("/imagenes/LagartoRes.png").toExternalForm());//imagen de resultado de la pc para lagarto
-    Image imgSrs = new Image(getClass().getResource("/imagenes/SpockRes.png").toExternalForm());//imagen de resultado de la pc spock
-    Image imagenR = new Image(getClass().getResource("/imagenes/GatoRecord.png").toExternalForm());//imagen de resultado de usuario para piedra
-    public void ActualizarLabelsV(){
-        lblVictoriaJ.setText(String.valueOf(victoriaJugador));
-        lblVictoriasPC.setText(String.valueOf(victoriaPc));
-        Vconsecutivas.setText(String.valueOf(victoriasConsecutivas));
-    }
-    private void guardarNuevoRecord(){
-        if(victoriasConsecutivas<=recordMasAlto) return;
-            try {
-                ArrayList<Record> Records=servicioRecord.consultarRecords();
-                Record recordExiste=null;
-                for(Record r:Records){
-                    if(r.getJugador()!=null&&
-                            r.getJugador().getId()==jugador.getId()&&
-                    r.getJuego()!=null&&
-                    r.getJuego().getId()==1){
-                        recordExiste=r;
-                        break;
-
-                    }
-
-                }
-                if(recordExiste==null){
-                    Record nuevo=new Record();
-                    nuevo.setJugador(jugador);
-                    Juego juego =new Juego();
-                    juego.setId(1);
-                    nuevo.setJuego(juego);
-                    nuevo.setFecha(new Date());
-                    nuevo.setRecord(victoriasConsecutivas);
-                    servicioRecord.guardarRecord(nuevo);
-                    System.out.println("Record recien insesrtado");
-
-                }else{
-                    if(victoriasConsecutivas>recordExiste.getRecord()){
-                        Record Actualizar =new Record();
-                        Actualizar.setId(recordExiste.getId());
-                        Actualizar.setJugador(jugador);
-                        Actualizar.setJuego(recordExiste.getJuego());
-                        Actualizar.setFecha(new Date());
-                        Actualizar.setRecord(victoriasConsecutivas);
-                        servicioRecord.actualizarRecord(Actualizar);
-                        System.out.println("Nuevo record");
-                    }else{
-                        System.out.println("Record NO superado :(");
-                        return;
-                    }
-                }
-
-lblRecord.setText("NUEVOOO RECORD");
-                imgRecord.setImage(imagenR);
-                recordMasAlto=victoriasConsecutivas;
-            } catch (Exception e) {
-                System.out.println("Error al guardarRecord" + e.getMessage());
-            }
-
-        }
-        public void cargarRecordExistente(){
-        try{
-            ArrayList<Record> todosRecord=servicioRecord.consultarRecords();
-            recordMasAlto=0;
-            for(Record r :todosRecord){
-               if (r.getJugador()!=null&&
-               r.getJugador().getId()==jugador.getId()&&
-               r.getJuego()!=null&&
-               r.getJuego().getId()==1){
-                   if(r.getRecord()>recordMasAlto)
-recordMasAlto=r.getRecord();
-               }
-            }
-
-        }catch(Exception e){
-
-        }
-        }
-    public void PiedraEleccion(ActionEvent event){
-        Image imgP = new Image(getClass().getResource("/imagenes/newPiedras.png").toExternalForm());//imagen de resultado de usuario para piedra
-        imgJugador.setImage(imgP); //cambiamos imageview del usuario por imagen de piedra
-        //calculamos tiro de la pc,ya sabemos que nosotros escogimos piedra
-        int pcJugada=(int)(Math.random()*5)+1;
-        //determinar el ganador
-        //1.Piedra,2.Tijera,3.Papel,4.Spock,5.Lagarto
-        if(pcJugada==1){
-            imgPC.setImage(imgPrs);//cambiamos imageview de pc por imagen de piedra
-            EleccionPc.setText("PC escogio Piedra");
-            lblResultado.setText("EMPATE!!, no hay ningun punto");
-        }else if (pcJugada==2){
-            imgPC.setImage(imgTrs);//cambiamos imageview de pc por imagen de tijera
-            EleccionPc.setText("PC escogio Tijeras");
-            lblResultado.setText("Ganaste,tu piedra aplasta sus tijeras ");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if(pcJugada==3){
-            imgPC.setImage(imgPPrs);
-            EleccionPc.setText("PC escogio Papel");
-            lblResultado.setText("Perdiste,su papel envuelve tu piedra ");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if(pcJugada==4){
-            imgPC.setImage(imgSrs);
-            EleccionPc.setText("PC escogio Spock");
-            lblResultado.setText("Perdiste,Spock vaporiza tu piedra ");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if(pcJugada==5){
-            imgPC.setImage(imgLrs);
-            EleccionPc.setText("PC escogio Lagarto");
-            lblResultado.setText("Ganaste,tu piedra aplasta su lagarto");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }
-        ActualizarLabelsV();
-    }
-    public void PapelEleccion(ActionEvent event){
-        Image imgPp = new Image(getClass().getResource("/imagenes/newPapel.png").toExternalForm());//imagen de resultado de usuario para piedra
-        imgJugador.setImage(imgPp);
-        //calculamos tiro de la pc,ya sabemos que nosotros escogimos Papel
-        int pcJugada=(int)(Math.random()*5)+1;
-        //determinar el ganador
-        //1.Piedra,2.Tijera,3.Papel,4.Spock,5.Lagarto
-        if(pcJugada==1){
-            imgPC.setImage(imgPrs);
-            EleccionPc.setText("PC escogio Piedra");
-            lblResultado.setText("Ganaste,tu papel envuelve su piedra ");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if (pcJugada==2){
-            imgPC.setImage(imgTrs);
-            EleccionPc.setText("PC escogio Tijeras");
-            lblResultado.setText("Perdiste,sus tijeras cortan tu papel");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if(pcJugada==3){
-            imgPC.setImage(imgPp);
-            EleccionPc.setText("PC escogio Papel");
-            lblResultado.setText("EMPATE!!, no hay ningun punto");
-        }else if(pcJugada==4){
-            imgPC.setImage(imgSrs);
-            EleccionPc.setText("PC escogio Spock");
-            lblResultado.setText("Ganaste,tu papel desautoriza Spock");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if(pcJugada==5){
-            imgPC.setImage(imgLrs);
-            EleccionPc.setText("PC escogio Lagarto");
-            lblResultado.setText("Perdiste,su lagarto devora papel ");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }
-        ActualizarLabelsV();
-    }
-    public void TijerasEleccion(ActionEvent event){
-        Image imgT = new Image(getClass().getResource("/imagenes/newTijeras.png").toExternalForm());//imagen de resultado de usuario para piedra
-        imgJugador.setImage(imgT);
-        //calculamos tiro de la pc,ya sabemos que nosotros escogimos Tijeras
-        int pcJugada=(int)(Math.random()*5)+1;
-        //determinar el ganador
-        //1.Piedra,2.Tijera,3.Papel,4.Spock,5.Lagarto
-        if(pcJugada==1){
-            imgPC.setImage(imgPrs);
-            EleccionPc.setText("PC escogio Piedra");
-            lblResultado.setText("Perdiste,su piedra aplasta tus tijeras ");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if (pcJugada==2){
-            imgPC.setImage(imgTrs);
-            EleccionPc.setText("PC escogio Tijeras");
-            lblResultado.setText("Empate!!!, no hay punto");
-        }else if(pcJugada==3){
-            imgPC.setImage(imgPPrs);
-            EleccionPc.setText("PC escogio Papel");
-            lblResultado.setText("Ganaste,tus tijeras cortan su papel");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if(pcJugada==4){
-            imgPC.setImage(imgSrs);
-            EleccionPc.setText("PC escogio Spock");
-            lblResultado.setText("Perdiste ,Spock rompe tus tijeras ");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if(pcJugada==5){
-            imgPC.setImage(imgLrs);
-            EleccionPc.setText("PC escogio Lagarto");
-            lblResultado.setText("Ganaste,tus tijeras decapitan su lagarto");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }
-        ActualizarLabelsV();
-    }
-    public void SpockEleccion(ActionEvent event){
-        Image imgS = new Image(getClass().getResource("/imagenes/newSpock.jpg.png").toExternalForm());//imagen de resultado de usuario para piedra
-        imgJugador.setImage(imgS);
-        //calculamos tiro de la pc,ya sabemos que nosotros escogimos Spock
-        int pcJugada=(int)(Math.random()*5)+1;
-        //determinar el ganador
-        //1.Piedra,2.Tijera,3.Papel,4.Spock,5.Lagarto
-        if(pcJugada==1){
-            imgPC.setImage(imgPrs);
-            EleccionPc.setText("PC escogio Piedra");
-            lblResultado.setText("Ganaste,Spock vaporiza su piedra");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if (pcJugada==2){
-            imgPC.setImage(imgTrs);
-            EleccionPc.setText("PC escogio Tijeras");
-            lblResultado.setText("Ganaste,Spock rompe sus tijeras ");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if(pcJugada==3){
-            imgPC.setImage(imgPPrs);
-            EleccionPc.setText("PC escogio Papel");
-            lblResultado.setText("Perdiste,su papel desautoriza Spock");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if(pcJugada==4){
-            imgPC.setImage(imgSrs);
-            EleccionPc.setText("PC escogio Spock");
-            lblResultado.setText("EMPATE!!!,no hay punto ");
-        }else if(pcJugada==5){
-            imgPC.setImage(imgLrs);
-            EleccionPc.setText("PC escogio Lagarto");
-            lblResultado.setText("Perdiste,su lagarto envenena a tu spock");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }
-        ActualizarLabelsV();
-    }
-    public void LagartoEleccion(ActionEvent event){
-        Image imgL = new Image(getClass().getResource("/imagenes/newLagarto.png").toExternalForm());//imagen de resultado de usuario para piedra
-        imgJugador.setImage(imgL);
-        //calculamos tiro de la pc,ya sabemos que nosotros escogimos Lagarto
-        int pcJugada=(int)(Math.random()*5)+1;
-        //determinar el ganador
-        //1.Piedra,2.Tijera,3.Papel,4.Spock,5.Lagarto
-        if(pcJugada==1){
-            imgPC.setImage(imgPrs);
-            EleccionPc.setText("PC escogio Piedra");
-            lblResultado.setText("Perdiste,su piedra aplasta tu lagarto");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if (pcJugada==2){
-            imgPC.setImage(imgTrs);
-            EleccionPc.setText("PC escogio Tijeras");
-            lblResultado.setText("Perdiste,sus tijeras decapitan tu lagarto");
-            victoriasConsecutivas=0;
-            victoriaPc++;
-        }else if(pcJugada==3){
-            imgPC.setImage(imgPPrs);
-            EleccionPc.setText("PC escogio Papel");
-            lblResultado.setText("Ganaste ,tu lagarto devora su papel");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if(pcJugada==4){
-            imgPC.setImage(imgSrs);
-            EleccionPc.setText("PC escogio Spock");
-            lblResultado.setText("Ganaste ,tu lagarto envenena spock");
-            victoriaJugador++;
-            victoriasConsecutivas++;
-            guardarNuevoRecord();
-        }else if(pcJugada==5){
-            imgPC.setImage(imgLrs);
-            EleccionPc.setText("PC escogio Lagarto");
-            lblResultado.setText("Empate!!!,no hay punto");
-        }
-        ActualizarLabelsV();
-    }
-    @FXML
-    public void Reinicio(){
-        victoriaJugador=0;
-        victoriaPc=0;
-        victoriasConsecutivas=0;
-        imgJugador.setImage(null);
-        imgPC.setImage(null);
-        lblRecord.setText("");
-        imgRecord.setImage(null);
-        ActualizarLabelsV();
-
-    }
-    public void Salir(ActionEvent event){
-        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacion.setTitle("Confirmar salida");
-        confirmacion.setHeaderText("¿Salir al menú principal?");
-        confirmacion.setContentText("Se perderá el progreso de la partida actual.");
-        Optional<ButtonType> resultado = confirmacion.showAndWait();
-
-        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
-            cerrarVentanaJuego();
+    private void ajustarFondo() {
+        if (bgImage != null && ApJuegoManos != null) {
+            bgImage.fitWidthProperty().bind(ApJuegoManos.widthProperty());
+            bgImage.fitHeightProperty().bind(ApJuegoManos.heightProperty());
         }
     }
-    private void cerrarVentanaJuego() {
+
+    private void cargarUltimoRecord() {
         try {
-            System.out.println("=== RESUMEN DE PARTIDA ===");
-            System.out.println("Victorias: " + victoriaJugador);
-            System.out.println("Derrotas: " + victoriaPc);
-            System.out.println("Victorias consecutivas: " + victoriasConsecutivas);
-            System.out.println("Record personal: " + recordMasAlto);
+            Record filtro = new Record();
+            filtro.setJugador(jugadorActual);
 
-            Stage stage = (Stage) btnSalir.getScene().getWindow();
-            stage.close();
+            Juego j = new Juego(); j.setId(ID_JUEGO);
+            filtro.setJuego(j);
+
+            ArrayList<Record> lista = servicioRecords.consultar(filtro);
+
+            if (lista != null && !lista.isEmpty()) {
+                this.ultimoRecord = lista.get(0);
+                lblRecordMaximo.setText("Récord a vencer: " + this.ultimoRecord.getRecord());
+            } else {
+                this.ultimoRecord = new Record();
+                this.ultimoRecord.setRecord(0);
+                lblRecordMaximo.setText("Sin récord previo");
+            }
+        } catch (Exception e) {
+            System.out.println("Error cargando récord: " + e.getMessage());
+        }
+    }
+
+    private void jugar(int eleccionJugador, String nombreImagen) {
+        try {
+            imgRecord.setImage(null);
+
+            ponerImagen(imgJugador, nombreImagen);
+            etiquetaEleccionJugador.setText(obtenerNombre(eleccionJugador));
+
+            int eleccionPC = (int)(Math.random() * 5) + 1;
+            mostrarPC(eleccionPC);
+
+            if (eleccionJugador == eleccionPC) {
+                lblResultado.setText("¡Empate!");
+                lblDetalleResultado.setText("Ambos eligieron " + obtenerNombre(eleccionPC));
+            } else if (ganaJugador(eleccionJugador, eleccionPC)) {
+                rachaActual++;
+                lblResultado.setText("¡Ganaste!");
+                lblDetalleResultado.setText(obtenerMensajeDetalle(eleccionJugador, eleccionPC));
+
+                if (rachaActual > ultimoRecord.getRecord()) {
+                    insertarNuevoRecord();
+                }
+            } else {
+                rachaActual = 0;
+                lblResultado.setText("Perdiste...");
+                lblDetalleResultado.setText(obtenerMensajeDetalle(eleccionPC, eleccionJugador));
+            }
+
+            lblRachaActual.setText("Racha Actual: " + rachaActual);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+            System.out.println("Error al jugar: " + e.getMessage());
         }
     }
+
+    private void insertarNuevoRecord() {
+        try {
+            Record nuevo = new Record();
+            nuevo.setJugador(jugadorActual);
+            Juego j = new Juego();
+            j.setId(ID_JUEGO);
+            nuevo.setJuego(j);
+            nuevo.setRecord(rachaActual);
+
+            servicioRecords.insertar(nuevo);
+
+            this.ultimoRecord = nuevo;
+
+            lblRecordMaximo.setText("¡NUEVO RÉCORD: " + rachaActual + "!");
+            ponerImagen(imgRecord, "GatoRecord.png");
+
+        } catch (Exception e) {
+            System.out.println("Error guardando récord: " + e.getMessage());
+        }
     }
 
+    // --- REGLAS Y MENSAJES (Basado en tu imagen) ---
+    private boolean ganaJugador(int j, int pc) {
+        return (j == PIEDRA && (pc == LAGARTO || pc == TIJERAS)) ||
+                (j == TIJERAS && (pc == PAPEL || pc == LAGARTO)) ||
+                (j == PAPEL && (pc == PIEDRA || pc == SPOCK)) ||
+                (j == SPOCK && (pc == TIJERAS || pc == PIEDRA)) ||
+                (j == LAGARTO && (pc == SPOCK || pc == PAPEL));
+    }
 
+    private String obtenerMensajeDetalle(int ganador, int perdedor) {
+        // Lógica exacta de la imagen que subiste
+        if (ganador == TIJERAS && perdedor == PAPEL) return "Tijeras cortan papel";
+        if (ganador == PAPEL && perdedor == PIEDRA) return "Papel tapa a piedra";
+        if (ganador == PIEDRA && perdedor == LAGARTO) return "Piedra aplasta a lagarto";
+        if (ganador == LAGARTO && perdedor == SPOCK) return "Lagarto envenena a Spock";
+        if (ganador == SPOCK && perdedor == TIJERAS) return "Spock rompe tijeras";
+        if (ganador == TIJERAS && perdedor == LAGARTO) return "Tijeras decapitan lagarto";
+        if (ganador == LAGARTO && perdedor == PAPEL) return "Lagarto devora papel";
+        if (ganador == PAPEL && perdedor == SPOCK) return "Papel desautoriza Spock";
+        if (ganador == SPOCK && perdedor == PIEDRA) return "Spock vaporiza piedra";
+        if (ganador == PIEDRA && perdedor == TIJERAS) return "Piedra aplasta a tijeras";
 
+        return "Gana " + obtenerNombre(ganador);
+    }
 
+    private String obtenerNombre(int op) {
+        switch(op) {
+            case PIEDRA: return "Piedra";
+            case TIJERAS: return "Tijeras";
+            case PAPEL: return "Papel";
+            case SPOCK: return "Spock";
+            case LAGARTO: return "Lagarto";
+            default: return "";
+        }
+    }
+
+    private void mostrarPC(int pc) {
+        String[] imgs = {"", "PiedraRes.png", "TijerasRes.png", "PapelRes.png", "SpockRes.png", "LagartoRes.png"};
+        EleccionPc.setText("PC eligió: " + obtenerNombre(pc));
+        etiquetaEleccionPC.setText(obtenerNombre(pc));
+        ponerImagen(imgPC, imgs[pc]);
+    }
+
+    private void ponerImagen(ImageView iv, String nombre) {
+        try {
+            String ruta = "/mx/uaemex/fi/paradigmas/pptls/imagenes/" + nombre;
+            URL url = getClass().getResource(ruta);
+
+            if (url != null) {
+                iv.setImage(new Image(url.toExternalForm()));
+            } else {
+                System.err.println("NO SE ENCUENTRA: " + nombre);
+            }
+        } catch (Exception e) {
+            System.err.println("Excepción img: " + e.getMessage());
+        }
+    }
+
+    @FXML public void PiedraEleccion(ActionEvent e)  { jugar(PIEDRA, "newPiedras.png"); }
+    @FXML public void TijerasEleccion(ActionEvent e) { jugar(TIJERAS, "newTijeras.png"); }
+    @FXML public void PapelEleccion(ActionEvent e)   { jugar(PAPEL, "newPapel.png"); }
+    @FXML public void SpockEleccion(ActionEvent e)   { jugar(SPOCK, "newSpock.jpg.png"); } // Revisa si es .png o .jpg
+    @FXML public void LagartoEleccion(ActionEvent e) { jugar(LAGARTO, "newLagarto.png"); }
+
+    @FXML
+    public void volverAlMenu(ActionEvent event) {
+        Stage stageActual = (Stage) lblUsuario.getScene().getWindow();
+        stageActual.close();
+        if (stageMenu != null) stageMenu.show();
+    }
+}

@@ -33,10 +33,10 @@ public class LoginController {
     private JugadoresService servicioJugadoresLocal;
     private JugadoresService servicioJugadoresOnline;
     private JugadoresService servicioJugadores;
+
     private RecordsService servicioRecordsLocal;
     private RecordsService servicioRecordsOnline;
     private RecordsService servicioRecords;
-
 
     public void setServicioJugadoresLocal(JugadoresService s) {
         this.servicioJugadoresLocal = s;
@@ -44,20 +44,25 @@ public class LoginController {
     public void setServicioJugadoresOnline(JugadoresService s) {
         this.servicioJugadoresOnline = s;
     }
-
-    public void setServicioRecordsLocal(RecordsService s) {//Aunque login no los usa los debe de pasar hasta que lleguen al juego
-        this.servicioRecordsLocal = s;
+    public void setServicioJugadores(JugadoresService s) {
+        this.servicioJugadores = s;
     }
 
+    public void setServicioRecords(RecordsService s) {
+        this.servicioRecords = s;
+    }
     public void setServicioRecordsOnline(RecordsService s) {
         this.servicioRecordsOnline = s;
     }
-
+    public void setServicioRecordsLocal(RecordsService s) {
+        this.servicioRecordsLocal = s;
+    }
 
     @FXML
     public void clickOnline() {
         this.servicioJugadores = this.servicioJugadoresOnline;
         this.servicioRecords = this.servicioRecordsOnline;
+
         System.out.println("Utilizando Servicio ONLINE");
 
         lblModoActual.setText("Modo: Multijugador (Online)");
@@ -71,6 +76,7 @@ public class LoginController {
     public void clicKLocal() {
         this.servicioJugadores = this.servicioJugadoresLocal;
         this.servicioRecords = this.servicioRecordsLocal;
+
         System.out.println("Utilizando Servicio LOCAL");
 
         lblModoActual.setText("Modo: Local");
@@ -104,7 +110,7 @@ public class LoginController {
             if (jugadorActual.getPassword().equals(password)) {
 
                 if (jugadorActual.isActivo()) {
-                    System.out.println("Login exitoso, abriendo juego...");
+                    System.out.println("Login exitoso, abriendo menú del juego...");
                     abrirVentanaMenu(jugadorActual);
                 } else {
                     mostrarError("Error: Cuenta inactiva");
@@ -132,9 +138,16 @@ public class LoginController {
             Scene scene = new Scene(fxmlLoader.load());
             MenuController menuController = fxmlLoader.getController();
 
-            menuController.setServicioJugadores(servicioJugadores);
-           menuController.setServicioRecords(servicioRecords);
             menuController.setJugador(jugadorActual);
+
+            menuController.setServicioJugadoresLocal(servicioJugadoresLocal);
+            menuController.setServicioJugadoresOnline(servicioJugadoresOnline);
+
+            menuController.setServicioRecordsLocal(servicioRecordsLocal);
+            menuController.setServicioRecordsOnline(servicioRecordsOnline);
+
+            menuController.setServicioRecords(servicioRecords);
+            menuController.setServicioJugadores(servicioJugadores);
 
             Stage stageNuevo = new Stage();
             stageNuevo.setTitle("Juego PPTLS");
@@ -158,8 +171,12 @@ public class LoginController {
             stage.setScene(scene);
 
             RegisterController registerController = fxmlLoader.getController();
+
             registerController.setServicioJugadoresOnline(this.servicioJugadoresOnline);
             registerController.setServicioJugadoresLocal(this.servicioJugadoresLocal);
+
+            registerController.setServicioRecordsLocal(this.servicioRecordsLocal);
+            registerController.setServicioRecordsOnline(this.servicioRecordsOnline);
 
             if (this.servicioJugadores == this.servicioJugadoresOnline) {
                 registerController.clickOnline();
@@ -169,7 +186,6 @@ public class LoginController {
 
         } catch (IOException e) {
             e.printStackTrace();
-
         }
     }
 }
