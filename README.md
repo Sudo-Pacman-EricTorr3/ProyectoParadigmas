@@ -1,10 +1,10 @@
 Hola, este es nuestro proyecto de Paradigmas de Programación I      
-Integrantes: 
--Geraldinne Gómez Ramírez 
--Yael Morales Medina
--Tendzin Angello Díaz Estrada
--Marco Antonio Aranda Moreno
--Eric Uriel Rojas Torres 
+Integrantes:
+1.	Geraldinne Gómez Ramírez 
+2.	Yael Morales Medina 
+3.	Tendzin Angello Díaz Estrada 
+4.	Marco Antonio Aranda Moreno 
+5.	Eric Uriel Rojas Torres
 
 Reglas del Juego
 
