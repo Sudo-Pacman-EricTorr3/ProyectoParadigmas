@@ -26,7 +26,6 @@ public class MenuController {
     @FXML private Button btnRecords;
     @FXML private Button btnRanking;
     @FXML private Button btnCerrarSesion;
-    @FXML private Button btnSalirJuego;
 
     private Jugador jugadorActual;
 
@@ -98,26 +97,21 @@ public class MenuController {
     @FXML
     protected void abrirRecords() {
         try {
-            // 1. Cargar la vista de Récords
+
             FXMLLoader loader = new FXMLLoader(Application.class.getResource("Records-view.fxml"));
             Parent root = loader.load();
 
-            // 2. Obtener el controlador
             RecordsController controller = loader.getController();
 
-            // 3. Obtener referencia del menú actual para ocultarlo
             Stage stageMenu = (Stage) btnRecords.getScene().getWindow();
 
-            // 4. Pasar datos (Jugador, Servicio y el Menú para volver)
             controller.inicializarDatos(this.jugadorActual, this.servicioRecords, stageMenu);
 
-            // 5. Configurar y mostrar ventana de Récords
             Stage stageRecords = new Stage();
             stageRecords.setTitle("Mis Récords - PPTLS");
             stageRecords.setScene(new Scene(root));
             stageRecords.show();
 
-            // 6. Ocultar el menú
             stageMenu.hide();
 
         } catch (IOException e) {
@@ -135,7 +129,6 @@ public class MenuController {
             RankingController controller = loader.getController();
             Stage stageMenu = (Stage) btnRanking.getScene().getWindow();
 
-            // Pasamos solo el servicio y la referencia del menú
             controller.inicializarDatos(this.servicioRecords, stageMenu);
 
             Stage stageRanking = new Stage();
